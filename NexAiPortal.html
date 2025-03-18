@@ -762,10 +762,51 @@
 
         async function fetchBundleData(address) {
             try {
-                const response = await fetch(`https://trench.bot/api/bundle_advanced/${address}`);
-                if (!response.ok) throw new Error('Bundle API request failed');
+                console.log('Fetching bundle data for:', address);
+                
+                // First try the bundle_advanced endpoint
+                let response = await fetch(`https://trench.bot/api/bundle_advanced/${address}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Origin': 'https://trench.bot',
+                        'Referer': 'https://trench.bot/'
+                    }
+                });
+                
+                // If that fails, try the regular bundle endpoint
+                if (!response.ok) {
+                    console.log('Bundle advanced API failed, trying regular bundle endpoint');
+                    response = await fetch(`https://trench.bot/api/bundle/${address}`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'Origin': 'https://trench.bot',
+                            'Referer': 'https://trench.bot/'
+                        }
+                    });
+                }
+                
+                console.log('Bundle API response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Bundle API error:', errorText);
+                    throw new Error(`Bundle API request failed with status ${response.status}`);
+                }
+                
                 const data = await response.json();
-                return data;
+                console.log('Bundle data received:', data);
+                
+                // Handle both advanced and regular bundle response formats
+                return {
+                    is_bundled: data.is_bundled || data.bundled || false,
+                    bundle_size: data.bundle_size || data.size || '0',
+                    bundle_type: data.bundle_type || data.type || 'N/A',
+                    bundle_expiry: data.bundle_expiry || data.expiry || null
+                };
             } catch (err) {
                 console.error('Failed to fetch bundle data:', err);
                 return null;
