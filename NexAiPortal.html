@@ -737,15 +737,22 @@
                 if (!response.ok) throw new Error('RugCheck API request failed');
                 const data = await response.json();
                 return {
-                    score: data.score || 0,
-                    normalizedScore: data.score_normalised || 0,
-                    risks: data.risks || [],
-                    totalHolders: data.totalHolders || 0,
+                    token: data.token || {},
+                    tokenMeta: data.tokenMeta || {},
                     topHolders: data.topHolders || [],
+                    risks: data.risks || [],
+                    score: data.score || 0,
+                    score_normalised: data.score_normalised || 0,
                     markets: data.markets || [],
                     totalMarketLiquidity: data.totalMarketLiquidity || 0,
+                    totalLPProviders: data.totalLPProviders || 0,
+                    totalHolders: data.totalHolders || 0,
+                    price: data.price || 0,
                     rugged: data.rugged || false,
-                    transferFee: data.transferFee || { pct: 0, maxAmount: 0 }
+                    transferFee: data.transferFee || { pct: 0, maxAmount: 0 },
+                    knownAccounts: data.knownAccounts || {},
+                    lockerOwners: data.lockerOwners || {},
+                    lockers: data.lockers || {}
                 };
             } catch (err) {
                 console.error('Failed to fetch RugCheck data:', err);
@@ -759,90 +766,87 @@
                 const resultsDiv = document.getElementById('analysisResults');
                 resultsDiv.innerHTML = '<div class="loading">Analyzing token...</div>';
 
-                const [dexScreenerData, solscanData, rugCheckData] = await Promise.all([
-                    fetchDexScreenerData(address),
-                    fetchSolscanData(address),
-                    fetchRugCheckData(address)
-                ]);
-
-                if (!dexScreenerData && !solscanData && !rugCheckData) {
+                const rugCheckData = await fetchRugCheckData(address);
+                if (!rugCheckData) {
                     throw new Error('Failed to fetch token data');
                 }
 
                 const metrics = [];
-                const tokenName = solscanData?.metadata?.name || dexScreenerData?.name || "Unknown Token";
-                const tokenSymbol = solscanData?.metadata?.symbol || dexScreenerData?.symbol;
 
-                // Check if token name ends with "pump" for liquidity lock status
-                const isPumpToken = tokenName.toLowerCase().endsWith('pump');
+                // Basic Token Info
+                const tokenInfo = {
+                    name: rugCheckData.tokenMeta?.name || "Unknown Token",
+                    symbol: rugCheckData.tokenMeta?.symbol || "???",
+                    supply: rugCheckData.token?.supply || 0,
+                    decimals: rugCheckData.token?.decimals || 0
+                };
 
-                // Risk Analysis from RugCheck
-                if (rugCheckData) {
-                    const riskScore = rugCheckData.normalizedScore;
-                    metrics.push({
-                        name: "Risk Analysis",
-                        status: riskScore > 70 ? "healthy" : riskScore > 40 ? "warning" : "danger",
-                        score: riskScore,
-                        details: `
-                            <div class="risk-analysis">
-                                <div class="risk-header">
-                                    <strong>Risk Score:</strong> ${riskScore}/100<br>
-                                    <strong>Rugged:</strong> ${rugCheckData.rugged ? '⚠️ Yes' : '✅ No'}<br>
-                                    ${rugCheckData.transferFee.pct > 0 ? 
-                                        `<strong>Transfer Fee:</strong> ${rugCheckData.transferFee.pct}%<br>` : ''}
+                // Risk Score Analysis
+                metrics.push({
+                    name: "Risk Analysis",
+                    status: rugCheckData.score_normalised > 70 ? "healthy" : rugCheckData.score_normalised > 40 ? "warning" : "danger",
+                    score: rugCheckData.score_normalised,
+                    details: `
+                        <div class="risk-analysis">
+                            <div class="risk-header">
+                                <strong>Raw Score:</strong> ${rugCheckData.score}<br>
+                                <strong>Normalized Score:</strong> ${rugCheckData.score_normalised}/100<br>
+                                <strong>Status:</strong> ${rugCheckData.rugged ? '⚠️ RUGGED' : '✅ Not Rugged'}<br>
+                                ${rugCheckData.transferFee.pct > 0 ? 
+                                    `<strong>Transfer Fee:</strong> ${rugCheckData.transferFee.pct}%<br>` : ''}
+                            </div>
+                            ${rugCheckData.risks.length > 0 ? `
+                                <div class="risk-warnings">
+                                    <strong>Risk Warnings:</strong><br>
+                                    ${rugCheckData.risks.map(risk => `
+                                        <div class="risk-item ${risk.level}">
+                                            • ${risk.name}${risk.description ? `: ${risk.description}` : ''}<br>
+                                            ${risk.score ? `Score Impact: ${risk.score}` : ''}
+                                        </div>
+                                    `).join('')}
                                 </div>
-                                ${rugCheckData.risks.length > 0 ? `
-                                    <div class="risk-warnings">
-                                        <strong>Risk Warnings:</strong><br>
-                                        ${rugCheckData.risks.map(risk => `
-                                            <div class="risk-item ${risk.level}">
-                                                • ${risk.name}${risk.description ? `: ${risk.description}` : ''}
-                                            </div>
-                                        `).join('')}
+                            ` : '<div class="risk-warnings">No specific risks detected</div>'}
+                        </div>
+                    `
+                });
+
+                // Market Analysis
+                if (rugCheckData.markets && rugCheckData.markets.length > 0) {
+                    const market = rugCheckData.markets[0]; // Get first market
+                    metrics.push({
+                        name: "Market Analysis",
+                        status: rugCheckData.totalMarketLiquidity > 50000 ? "healthy" : rugCheckData.totalMarketLiquidity > 10000 ? "warning" : "danger",
+                        score: Math.min(100, Math.round((rugCheckData.totalMarketLiquidity / 50000) * 100)),
+                        details: `
+                            <div class="market-analysis">
+                                <strong>Total Liquidity:</strong> ${formatVolumeData(rugCheckData.totalMarketLiquidity)}<br>
+                                <strong>Price:</strong> $${rugCheckData.price.toFixed(12)}<br>
+                                <strong>LP Providers:</strong> ${rugCheckData.totalLPProviders}<br>
+                                ${market.lp ? `
+                                    <div class="lp-details">
+                                        <strong>LP Details:</strong><br>
+                                        • Locked: ${market.lp.lpLocked ? formatVolumeData(market.lp.lpLocked) : 'None'}<br>
+                                        • Unlocked: ${market.lp.lpUnlocked ? formatVolumeData(market.lp.lpUnlocked) : 'None'}<br>
+                                        • Locked %: ${market.lp.lpLockedPct}%<br>
+                                        • Total LP Value: ${formatVolumeData(market.lp.lpLockedUSD)}
                                     </div>
                                 ` : ''}
-                                <div class="market-info">
-                                    <strong>Total Market Liquidity:</strong> ${formatVolumeData(rugCheckData.totalMarketLiquidity)}<br>
-                                    <strong>Total Holders:</strong> ${rugCheckData.totalHolders?.toLocaleString() || 'N/A'}
-                                </div>
                             </div>
                         `
                     });
                 }
 
-                // Liquidity Analysis
-                if (dexScreenerData?.liquidity) {
-                    const liquidity = dexScreenerData.liquidity;
-                    if (isPumpToken) {
-                        liquidity.isLocked = true;
-                        liquidity.lockedPercentage = 100;
-                    }
-                    
+                // Holder Analysis
+                if (rugCheckData.topHolders) {
+                    const totalHoldersScore = Math.min(100, Math.round((rugCheckData.totalHolders / 1000) * 100));
                     metrics.push({
-                        name: "Liquidity",
-                        status: liquidity.usd > 100000 ? "healthy" : liquidity.usd > 50000 ? "warning" : "danger",
-                        score: Math.min(100, Math.round((liquidity.usd / 100000) * 100)),
-                        details: `
-                            Amount: $${liquidity.usd.toLocaleString()}<br>
-                            Status: ${liquidity.isLocked ? '🔒 Locked' : '🔓 Unlocked'}${isPumpToken ? ' (Pump Token)' : ''}<br>
-                            ${liquidity.isLocked ? `Locked Amount: $${liquidity.usd.toLocaleString()}<br>
-                            Locked Percentage: ${isPumpToken ? '100' : liquidity.lockedPercentage}%` : ''}
-                        `
-                    });
-                }
-
-                // Top 10 Holders (Separate from general holder distribution)
-                if (solscanData?.holders) {
-                    const holders = solscanData.holders;
-                    metrics.push({
-                        name: "Top 10 Holders",
-                        status: holders.top10Percentage < 50 ? "healthy" : holders.top10Percentage < 70 ? "warning" : "danger",
-                        score: Math.max(0, 100 - Math.round(holders.top10Percentage)),
+                        name: "Holder Distribution",
+                        status: totalHoldersScore > 70 ? "healthy" : totalHoldersScore > 40 ? "warning" : "danger",
+                        score: totalHoldersScore,
                         details: `
                             <div class="holder-list">
                                 <div class="holder-header">
-                                    <strong>Total Holders:</strong> ${holders.total.toLocaleString()}<br>
-                                    <strong>Combined Top 10:</strong> ${holders.top10Percentage.toFixed(2)}%
+                                    <strong>Total Holders:</strong> ${rugCheckData.totalHolders.toLocaleString()}<br>
                                 </div>
                                 <div class="holder-table">
                                     <table>
@@ -850,17 +854,31 @@
                                             <tr>
                                                 <th>Rank</th>
                                                 <th>Address</th>
+                                                <th>Amount</th>
                                                 <th>Percentage</th>
+                                                <th>Type</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            ${holders.top10.map((holder, i) => `
-                                                <tr>
-                                                    <td>#${i + 1}</td>
-                                                    <td><a href="https://solscan.io/account/${holder.address}" target="_blank">${holder.address.substring(0, 6)}...${holder.address.substring(holder.address.length - 4)}</a></td>
-                                                    <td>${holder.percentage.toFixed(2)}%</td>
-                                                </tr>
-                                            `).join('')}
+                                            ${rugCheckData.topHolders.map((holder, i) => {
+                                                const isKnown = rugCheckData.knownAccounts[holder.owner];
+                                                const accountType = isKnown ? isKnown.type : '';
+                                                const accountName = isKnown ? isKnown.name : '';
+                                                return `
+                                                    <tr>
+                                                        <td>#${i + 1}</td>
+                                                        <td>
+                                                            <a href="https://solscan.io/account/${holder.owner}" target="_blank">
+                                                                ${holder.owner.substring(0, 6)}...${holder.owner.substring(holder.owner.length - 4)}
+                                                            </a>
+                                                            ${accountName ? `<br><small>(${accountName})</small>` : ''}
+                                                        </td>
+                                                        <td>${(holder.uiAmount).toLocaleString()}</td>
+                                                        <td>${holder.pct.toFixed(2)}%</td>
+                                                        <td>${accountType || '-'}</td>
+                                                    </tr>
+                                                `;
+                                            }).join('')}
                                         </tbody>
                                     </table>
                                 </div>
@@ -869,44 +887,27 @@
                     });
                 }
 
-                // Volume Analysis
-                if (dexScreenerData?.volume) {
-                    const volume = dexScreenerData.volume;
-                    const volumeScore = Math.min(100, Math.round((volume.h24 / 50000) * 100));
-                    metrics.push({
-                        name: "Trading Volume",
-                        status: volumeScore > 80 ? "healthy" : volumeScore > 40 ? "warning" : "danger",
-                        score: volumeScore,
-                        details: `
-                            5M: ${formatVolumeData(volume.m5)}<br>
-                            1H: ${formatVolumeData(volume.h1)}<br>
-                            6H: ${formatVolumeData(volume.h6)}<br>
-                            24H: ${formatVolumeData(volume.h24)}
-                        `
-                    });
-                }
-
-                // Contract Safety
-                if (solscanData?.metadata) {
-                    const metadata = solscanData.metadata;
-                    const safetyScore = (metadata.verified ? 50 : 0) + (metadata.website ? 30 : 0);
-                    
-                    metrics.push({
-                        name: "Contract Safety",
-                        status: safetyScore > 70 ? "healthy" : safetyScore > 40 ? "warning" : "danger",
-                        score: safetyScore,
-                        details: `
-                            ${metadata.verified ? '✓' : '✗'} Verified Contract<br>
-                            ${metadata.website ? '✓' : '✗'} Website Present<br>
-                            ${metadata.website ? `Website: ${metadata.website}` : ''}
-                        `
-                    });
-                }
+                // Contract Analysis
+                metrics.push({
+                    name: "Contract Info",
+                    status: "info",
+                    score: "-",
+                    details: `
+                        <div class="contract-info">
+                            <strong>Token Program:</strong> ${rugCheckData.token?.tokenProgram || 'N/A'}<br>
+                            <strong>Mint Authority:</strong> ${rugCheckData.token?.mintAuthority || 'None'}<br>
+                            <strong>Freeze Authority:</strong> ${rugCheckData.token?.freezeAuthority || 'None'}<br>
+                            <strong>Supply:</strong> ${(rugCheckData.token?.supply / Math.pow(10, rugCheckData.token?.decimals)).toLocaleString()} ${tokenInfo.symbol}<br>
+                            <strong>Decimals:</strong> ${rugCheckData.token?.decimals}<br>
+                            <strong>Creator:</strong> <a href="https://solscan.io/account/${rugCheckData.creator}" target="_blank">${rugCheckData.creator}</a>
+                        </div>
+                    `
+                });
 
                 // Display results
                 displayAnalysisResults({
-                    tokenName: tokenName,
-                    tokenSymbol: tokenSymbol,
+                    tokenName: tokenInfo.name,
+                    tokenSymbol: tokenInfo.symbol,
                     metrics: metrics
                 });
 
