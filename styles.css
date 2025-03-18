@@ -1177,245 +1177,232 @@ footer {
 }
 
 .analysis-card {
-    background: rgba(0, 38, 64, 0.3);
-    border-radius: 20px;
-    padding: 2rem;
-    border: 1px solid rgba(0, 162, 255, 0.15);
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
-}
-
-.token-header {
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid rgba(0, 162, 255, 0.15);
-}
-
-.token-title {
-    display: flex;
-    align-items: baseline;
-    gap: 1rem;
-}
-
-.token-title h2 {
-    margin: 0;
-    font-size: 2rem;
-    color: var(--primary-color);
-    font-weight: 600;
-}
-
-.token-symbol {
-    font-size: 1.2rem;
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: 500;
-}
-
-.analysis-sections {
+    background: #000;
+    border-radius: 12px;
+    padding: 20px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
+    gap: 20px;
+    color: #fff;
 }
 
-.analysis-section {
-    background: rgba(0, 38, 64, 0.4);
-    border-radius: 16px;
-    padding: 1.5rem;
-    border: 1px solid rgba(0, 162, 255, 0.1);
-    transition: all 0.3s ease;
+.risk-overview {
+    background: #000;
+    border: 1px solid #1a1a1a;
+    border-radius: 8px;
+    padding: 20px;
 }
 
-.analysis-section:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    border-color: rgba(0, 162, 255, 0.3);
-}
-
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.section-header h3 {
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 500;
-    color: var(--text-color);
-}
-
-.score-badge {
+.risk-score {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0.5rem 1rem;
-    border-radius: 12px;
-    background: rgba(0, 0, 0, 0.2);
-    min-width: 80px;
+    text-align: center;
 }
 
-.score-badge.healthy {
-    background: rgba(52, 199, 89, 0.1);
-    border: 1px solid rgba(52, 199, 89, 0.3);
-}
-
-.score-badge.warning {
-    background: rgba(255, 149, 0, 0.1);
-    border: 1px solid rgba(255, 149, 0, 0.3);
-}
-
-.score-badge.danger {
-    background: rgba(255, 59, 48, 0.1);
-    border: 1px solid rgba(255, 59, 48, 0.3);
+.risk-score h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
 }
 
 .score-value {
-    font-size: 1.5rem;
-    font-weight: 600;
-    line-height: 1;
-    margin-bottom: 0.25rem;
+    font-size: 48px;
+    font-weight: bold;
+    margin: 10px 0;
 }
 
-.score-badge.healthy .score-value {
-    color: #34c759;
+.risk-label {
+    display: inline-block;
+    padding: 8px 40px;
+    background: #002f0b;
+    color: #00ff29;
+    border: 1px solid #00ff29;
+    border-radius: 4px;
+    font-size: 14px;
+    text-transform: uppercase;
 }
 
-.score-badge.warning .score-value {
-    color: #ff9500;
+.risk-warnings {
+    margin-top: 20px;
+    padding: 10px;
+    background: #ff8c001a;
+    border-radius: 4px;
+    color: #ff8c00;
 }
 
-.score-badge.danger .score-value {
-    color: #ff3b30;
-}
-
-.score-label {
-    font-size: 0.75rem;
-    opacity: 0.7;
-}
-
-.section-content {
-    font-size: 0.95rem;
-    line-height: 1.6;
-}
-
-/* Risk Section Specific Styles */
-.risk-section .risk-warnings {
-    margin-top: 1rem;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 12px;
-    padding: 1rem;
-}
-
-.risk-section .risk-header {
-    margin-bottom: 1rem;
-    padding: 1rem;
-    background: rgba(0, 0, 0, 0.15);
+.token-overview {
+    background: #000;
+    border: 1px solid #1a1a1a;
     border-radius: 8px;
-    border: none;
+    padding: 20px;
 }
 
-/* Market Section Specific Styles */
-.market-section .market-analysis {
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 12px;
-    padding: 1rem;
+.token-overview h2 {
+    font-size: 18px;
+    margin-bottom: 20px;
 }
 
-.market-section .lp-details {
-    margin-top: 1rem;
-    padding: 1rem;
-    background: rgba(0, 0, 0, 0.15);
+.token-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.token-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.token-detail .label {
+    color: #666;
+    font-size: 14px;
+}
+
+.token-detail .value {
+    color: #fff;
+    font-size: 14px;
+    word-break: break-all;
+}
+
+.custom-domain {
+    background: #000;
+    border: 1px solid #1a1a1a;
     border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+}
+
+.custom-domain h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.custom-domain p {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.claim-btn {
+    background: #00a352;
+    color: #fff;
     border: none;
+    padding: 8px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
 }
 
-/* Holders Section Specific Styles */
-.holders-section .holder-table {
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 12px;
-    padding: 0.5rem;
-    margin-top: 1rem;
+.community-sentiment {
+    background: #000;
+    border: 1px solid #1a1a1a;
+    border-radius: 8px;
+    padding: 20px;
 }
 
-.holders-section table {
+.community-sentiment h2 {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.sentiment-indicators {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.sentiment {
+    padding: 20px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sentiment.negative {
+    background: #ff000d1a;
+}
+
+.sentiment.positive {
+    background: #00a3521a;
+}
+
+.insider-networks {
+    background: #000;
+    border: 1px solid #1a1a1a;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.insider-networks h2 {
+    font-size: 18px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.beta-tag {
+    background: #666;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.network-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #00ff29;
+    font-size: 14px;
+}
+
+.status-icon {
+    color: #00ff29;
+}
+
+.markets, .top-holders {
+    background: #000;
+    border: 1px solid #1a1a1a;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.markets h2, .top-holders h2 {
+    font-size: 18px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.percentage {
+    color: #666;
+    font-size: 14px;
+}
+
+table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    font-size: 0.85rem;
 }
 
-.holders-section th {
-    background: rgba(0, 162, 255, 0.1);
-    padding: 0.75rem;
+th {
     text-align: left;
-    font-weight: 500;
-    border-bottom: 1px solid rgba(0, 162, 255, 0.2);
+    padding: 10px;
+    color: #666;
+    font-weight: normal;
+    font-size: 14px;
+    border-bottom: 1px solid #1a1a1a;
 }
 
-.holders-section td {
-    padding: 0.75rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+td {
+    padding: 10px;
+    font-size: 14px;
+    border-bottom: 1px solid #1a1a1a;
 }
 
-.holders-section tr:last-child td {
+tr:last-child td {
     border-bottom: none;
-}
-
-.holders-section tr:hover td {
-    background: rgba(0, 162, 255, 0.05);
-}
-
-/* Contract Section Specific Styles */
-.contract-section .contract-info {
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 12px;
-    padding: 1rem;
-}
-
-.info-badge {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 162, 255, 0.1);
-    border-radius: 50%;
-    color: var(--primary-color);
-}
-
-.contract-section a {
-    color: var(--primary-color);
-    text-decoration: none;
-    transition: all 0.2s ease;
-}
-
-.contract-section a:hover {
-    opacity: 0.8;
-    text-decoration: underline;
-}
-
-/* Risk Items Styling */
-.risk-item {
-    margin: 0.75rem 0;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.2);
-    font-size: 0.9rem;
-    line-height: 1.5;
-}
-
-.risk-item.high {
-    border-left: 3px solid #ff3b30;
-    color: #ff3b30;
-}
-
-.risk-item.warn {
-    border-left: 3px solid #ff9500;
-    color: #ff9500;
-}
-
-.risk-item.low {
-    border-left: 3px solid #34c759;
-    color: #34c759;
 } 
