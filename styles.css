@@ -1316,4 +1316,57 @@ footer {
     margin: 0;
     font-size: 1.5rem;
     color: var(--primary-color);
+}
+
+.holder-list {
+    margin-top: 10px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.holder-header {
+    margin-bottom: 15px;
+    font-size: 0.95em;
+    line-height: 1.4;
+}
+
+.holder-table {
+    overflow-x: auto;
+    margin-top: 10px;
+}
+
+.holder-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+}
+
+.holder-table th {
+    background: rgba(0, 0, 0, 0.1);
+    padding: 8px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.holder-table td {
+    padding: 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.holder-table tr:last-child td {
+    border-bottom: none;
+}
+
+.holder-table a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.holder-table a:hover {
+    text-decoration: underline;
+}
+
+.holder-table tr:hover {
+    background: rgba(0, 0, 0, 0.02);
 } 
