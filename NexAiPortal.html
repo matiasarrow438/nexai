@@ -169,9 +169,23 @@
         let wallet = null;
         let connection = null;
 
-        // Token lists
-        const majorTokens = ['bitcoin', 'ethereum', 'solana', 'litecoin', 'cardano', 'polkadot'];
-        const memeTokens = ['dogecoin', 'shiba-inu', 'pepe', 'floki', 'bonk'];
+        // Token lists with IDs
+        const majorTokens = [
+            { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC' },
+            { id: 'ethereum', name: 'Ethereum', symbol: 'ETH' },
+            { id: 'solana', name: 'Solana', symbol: 'SOL' },
+            { id: 'litecoin', name: 'Litecoin', symbol: 'LTC' },
+            { id: 'cardano', name: 'Cardano', symbol: 'ADA' },
+            { id: 'polkadot', name: 'Polkadot', symbol: 'DOT' }
+        ];
+
+        const memeTokens = [
+            { id: 'dogecoin', name: 'Dogecoin', symbol: 'DOGE' },
+            { id: 'shiba-inu', name: 'Shiba Inu', symbol: 'SHIB' },
+            { id: 'pepe', name: 'Pepe', symbol: 'PEPE' },
+            { id: 'floki', name: 'Floki', symbol: 'FLOKI' },
+            { id: 'bonk', name: 'Bonk', symbol: 'BONK' }
+        ];
 
         async function initWallet() {
             try {
@@ -307,15 +321,25 @@
 
         async function fetchTokenData(tokenId) {
             try {
-                const response = await fetch(`https://api.coingecko.com/api/v3/coins/${tokenId}?localization=false&tickers=false&community_data=false&developer_data=false`);
+                // Add a small delay between requests to avoid rate limiting
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${tokenId}&vs_currencies=usd&include_24hr_change=true&include_market_cap=true`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const data = await response.json();
+                
+                if (!data[tokenId]) {
+                    throw new Error('Token data not found');
+                }
+
                 return {
-                    name: data.name,
-                    symbol: data.symbol.toUpperCase(),
-                    image: data.image.small,
-                    price: data.market_data.current_price.usd,
-                    priceChange: data.market_data.price_change_percentage_24h,
-                    marketCap: data.market_data.market_cap.usd
+                    price: data[tokenId].usd,
+                    priceChange: data[tokenId].usd_24h_change,
+                    marketCap: data[tokenId].usd_market_cap
                 };
             } catch (err) {
                 console.error(`Failed to fetch data for ${tokenId}:`, err);
@@ -323,8 +347,22 @@
             }
         }
 
-        function createTokenCard(tokenData) {
-            if (!tokenData) return '';
+        function createTokenCard(token, tokenData) {
+            if (!tokenData) {
+                return `
+                    <div class="token-card">
+                        <div class="token-header">
+                            <div class="token-icon-placeholder"></div>
+                            <h4>${token.name} (${token.symbol})</h4>
+                        </div>
+                        <div class="token-stats">
+                            <p class="price">Price: Failed to load</p>
+                            <p class="change">24h: --</p>
+                            <p class="market-cap">Market Cap: --</p>
+                        </div>
+                    </div>
+                `;
+            }
             
             const priceChangeColor = tokenData.priceChange >= 0 ? 'positive' : 'negative';
             const formattedPrice = new Intl.NumberFormat('en-US', {
@@ -344,12 +382,12 @@
             return `
                 <div class="token-card">
                     <div class="token-header">
-                        <img src="${tokenData.image}" alt="${tokenData.name}" class="token-icon">
-                        <h4>${tokenData.name} (${tokenData.symbol})</h4>
+                        <div class="token-icon-placeholder"></div>
+                        <h4>${token.name} (${token.symbol})</h4>
                     </div>
                     <div class="token-stats">
                         <p class="price">Price: ${formattedPrice}</p>
-                        <p class="change ${priceChangeColor}">24h: ${tokenData.priceChange.toFixed(2)}%</p>
+                        <p class="change ${priceChangeColor}">24h: ${tokenData.priceChange?.toFixed(2) || '--'}%</p>
                         <p class="market-cap">Market Cap: ${formattedMarketCap}</p>
                     </div>
                 </div>
@@ -360,29 +398,33 @@
             const majorTokensContainer = document.getElementById('majorTokens');
             const memeTokensContainer = document.getElementById('memeTokens');
             
-            // Update major tokens
-            let majorTokensHTML = '';
-            for (const token of majorTokens) {
-                const tokenData = await fetchTokenData(token);
-                if (tokenData) {
-                    majorTokensHTML += createTokenCard(tokenData);
+            try {
+                // Update major tokens
+                majorTokensContainer.innerHTML = '<div class="loading-spinner"></div>';
+                let majorTokensHTML = '';
+                for (const token of majorTokens) {
+                    const tokenData = await fetchTokenData(token.id);
+                    majorTokensHTML += createTokenCard(token, tokenData);
                 }
-            }
-            majorTokensContainer.innerHTML = majorTokensHTML || '<p class="error-text">Failed to load token data</p>';
-            
-            // Update memecoins
-            let memeTokensHTML = '';
-            for (const token of memeTokens) {
-                const tokenData = await fetchTokenData(token);
-                if (tokenData) {
-                    memeTokensHTML += createTokenCard(tokenData);
+                majorTokensContainer.innerHTML = majorTokensHTML;
+                
+                // Update memecoins
+                memeTokensContainer.innerHTML = '<div class="loading-spinner"></div>';
+                let memeTokensHTML = '';
+                for (const token of memeTokens) {
+                    const tokenData = await fetchTokenData(token.id);
+                    memeTokensHTML += createTokenCard(token, tokenData);
                 }
+                memeTokensContainer.innerHTML = memeTokensHTML;
+            } catch (err) {
+                console.error('Failed to update token analytics:', err);
+                majorTokensContainer.innerHTML = '<p class="error-text">Failed to load token data. Please try again later.</p>';
+                memeTokensContainer.innerHTML = '<p class="error-text">Failed to load token data. Please try again later.</p>';
             }
-            memeTokensContainer.innerHTML = memeTokensHTML || '<p class="error-text">Failed to load token data</p>';
         }
 
-        // Update analytics every 60 seconds
-        setInterval(updateTokenAnalytics, 60000);
+        // Update analytics every 2 minutes to avoid rate limiting
+        setInterval(updateTokenAnalytics, 120000);
     </script>
 </body>
 </html>
