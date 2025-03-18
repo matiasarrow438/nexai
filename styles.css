@@ -1061,4 +1061,203 @@ footer {
 
 .notification-close:hover {
     opacity: 1;
+}
+
+.top-bar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding: 1rem 2rem;
+    z-index: 100;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.wallet-status {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(0, 162, 255, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 162, 255, 0.2);
+}
+
+#walletAddressShort {
+    color: var(--text-color);
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
+.disconnect-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    border: none;
+    color: #ff3b30;
+    font-size: 0.9rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.disconnect-btn:hover {
+    background: rgba(255, 59, 48, 0.1);
+}
+
+/* Token Analysis Styles */
+.token-analysis {
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.token-input-section {
+    background: rgba(0, 162, 255, 0.05);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(0, 162, 255, 0.1);
+}
+
+.token-input-section h2 {
+    margin: 0 0 1rem 0;
+    color: var(--text-color);
+}
+
+.token-input-section p {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1.5rem;
+}
+
+.token-input-container {
+    display: flex;
+    gap: 1rem;
+}
+
+.token-input {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(0, 162, 255, 0.2);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: var(--text-color);
+    font-size: 0.95rem;
+}
+
+.token-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.analyze-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.analyze-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 162, 255, 0.2);
+}
+
+.analysis-results {
+    margin-top: 2rem;
+}
+
+.analysis-card {
+    background: rgba(0, 162, 255, 0.05);
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid rgba(0, 162, 255, 0.1);
+}
+
+.analysis-card h3 {
+    margin: 0 0 1.5rem 0;
+    color: var(--text-color);
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.metric-card {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    border: 1px solid rgba(0, 162, 255, 0.1);
+}
+
+.metric-card h4 {
+    margin: 0 0 1rem 0;
+    color: var(--text-color);
+}
+
+.score-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    position: relative;
+}
+
+.metric-card.healthy .score-circle {
+    background: rgba(52, 199, 89, 0.1);
+    color: #34c759;
+    border: 2px solid #34c759;
+}
+
+.metric-card.warning .score-circle {
+    background: rgba(255, 149, 0, 0.1);
+    color: #ff9500;
+    border: 2px solid #ff9500;
+}
+
+.metric-card.danger .score-circle {
+    background: rgba(255, 59, 48, 0.1);
+    color: #ff3b30;
+    border: 2px solid #ff3b30;
+}
+
+.status-text {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.metric-card.healthy .status-text {
+    color: #34c759;
+}
+
+.metric-card.warning .status-text {
+    color: #ff9500;
+}
+
+.metric-card.danger .status-text {
+    color: #ff3b30;
+}
+
+.loading {
+    text-align: center;
+    color: var(--text-color);
+    padding: 2rem;
+    font-size: 1.1rem;
 } 
