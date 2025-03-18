@@ -638,8 +638,40 @@
         async function fetchDexScreenerData(address) {
             try {
                 const response = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${address}`);
+                if (!response.ok) throw new Error('DexScreener API request failed');
                 const data = await response.json();
-                return data.pairs?.[0]; // Get the most liquid pair
+                
+                // Get the most liquid pair
+                const pairs = data.pairs || [];
+                if (pairs.length === 0) return null;
+                
+                // Sort pairs by liquidity and get the most liquid one
+                const mainPair = pairs.sort((a, b) => 
+                    parseFloat(b.liquidity?.usd || 0) - parseFloat(a.liquidity?.usd || 0)
+                )[0];
+
+                return {
+                    name: mainPair.baseToken.name,
+                    symbol: mainPair.baseToken.symbol,
+                    liquidity: {
+                        usd: parseFloat(mainPair.liquidity?.usd || 0),
+                        isLocked: mainPair.liquidity?.locked || false,
+                        lockedAmount: mainPair.liquidity?.lockedAmount || "0",
+                        lockedPercentage: mainPair.liquidity?.lockedPercentage || 0
+                    },
+                    volume: {
+                        m5: parseFloat(mainPair.volume?.m5 || 0),
+                        h1: parseFloat(mainPair.volume?.h1 || 0),
+                        h6: parseFloat(mainPair.volume?.h6 || 0),
+                        h24: parseFloat(mainPair.volume?.h24 || 0)
+                    },
+                    priceChange: {
+                        m5: parseFloat(mainPair.priceChange?.m5 || 0),
+                        h1: parseFloat(mainPair.priceChange?.h1 || 0),
+                        h6: parseFloat(mainPair.priceChange?.h6 || 0),
+                        h24: parseFloat(mainPair.priceChange?.h24 || 0)
+                    }
+                };
             } catch (err) {
                 console.error('Failed to fetch DexScreener data:', err);
                 return null;
@@ -648,17 +680,39 @@
 
         async function fetchSolscanData(address) {
             try {
-                const [holdersResponse, metadataResponse] = await Promise.all([
+                const [holdersResponse, metadataResponse, holderStatsResponse] = await Promise.all([
                     fetch(`https://public-api.solscan.io/token/holders?tokenAddress=${address}&limit=10&offset=0`),
-                    fetch(`https://public-api.solscan.io/token/meta?tokenAddress=${address}`)
+                    fetch(`https://public-api.solscan.io/token/meta?tokenAddress=${address}`),
+                    fetch(`https://public-api.solscan.io/token/holders/statistic?tokenAddress=${address}`)
                 ]);
-                
-                const holdersData = await holdersResponse.json();
-                const metadata = await metadataResponse.json();
-                
+
+                if (!holdersResponse.ok || !metadataResponse.ok || !holderStatsResponse.ok) {
+                    throw new Error('One or more Solscan API requests failed');
+                }
+
+                const [holdersData, metadata, holderStats] = await Promise.all([
+                    holdersResponse.json(),
+                    metadataResponse.json(),
+                    holderStatsResponse.json()
+                ]);
+
                 return {
-                    holders: holdersData.data,
-                    metadata: metadata
+                    holders: {
+                        total: holderStats.total || 0,
+                        top10: holdersData.data?.slice(0, 10).map(holder => ({
+                            address: holder.address,
+                            amount: holder.amount,
+                            percentage: holder.share
+                        })) || [],
+                        top10Percentage: holdersData.data?.slice(0, 10)
+                            .reduce((sum, holder) => sum + parseFloat(holder.share || 0), 0) || 0
+                    },
+                    metadata: {
+                        name: metadata.name,
+                        symbol: metadata.symbol,
+                        verified: metadata.verifiedCreator || false,
+                        website: metadata.website || null
+                    }
                 };
             } catch (err) {
                 console.error('Failed to fetch Solscan data:', err);
@@ -666,14 +720,23 @@
             }
         }
 
+        // Add helper function to format volume data
+        function formatVolumeData(volume) {
+            if (!volume) return "N/A";
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                notation: 'compact',
+                maximumFractionDigits: 2
+            }).format(volume);
+        }
+
         // Update the analyzeToken function
         async function analyzeToken(address) {
             try {
-                // Show loading state
                 const resultsDiv = document.getElementById('analysisResults');
                 resultsDiv.innerHTML = '<div class="loading">Analyzing token...</div>';
 
-                // Fetch data from both APIs
                 const [dexScreenerData, solscanData] = await Promise.all([
                     fetchDexScreenerData(address),
                     fetchSolscanData(address)
@@ -683,66 +746,82 @@
                     throw new Error('Failed to fetch token data');
                 }
 
-                // Calculate metrics
                 const metrics = [];
 
                 // Liquidity Analysis
-                if (dexScreenerData) {
-                    const liquidity = parseFloat(dexScreenerData.liquidity?.usd || 0);
+                if (dexScreenerData?.liquidity) {
+                    const liquidity = dexScreenerData.liquidity;
                     metrics.push({
                         name: "Liquidity",
-                        status: liquidity > 100000 ? "healthy" : liquidity > 50000 ? "warning" : "danger",
-                        score: Math.min(100, Math.round((liquidity / 100000) * 100)),
-                        details: `$${liquidity.toLocaleString()}`
+                        status: liquidity.usd > 100000 ? "healthy" : liquidity.usd > 50000 ? "warning" : "danger",
+                        score: Math.min(100, Math.round((liquidity.usd / 100000) * 100)),
+                        details: `
+                            Amount: $${liquidity.usd.toLocaleString()}<br>
+                            Status: ${liquidity.isLocked ? '🔒 Locked' : '🔓 Unlocked'}<br>
+                            ${liquidity.isLocked ? `Locked Amount: ${liquidity.lockedAmount}<br>
+                            Locked Percentage: ${liquidity.lockedPercentage}%` : ''}
+                        `
                     });
+                }
 
-                    // Volume Analysis (5m/10m/1h)
-                    const volume = {
-                        "5m": parseFloat(dexScreenerData.volume?.m5 || 0),
-                        "10m": parseFloat(dexScreenerData.volume?.m10 || 0),
-                        "1h": parseFloat(dexScreenerData.volume?.h1 || 0)
-                    };
-
-                    const volumeScore = Math.min(100, Math.round((volume["1h"] / 10000) * 100));
+                // Volume Analysis
+                if (dexScreenerData?.volume) {
+                    const volume = dexScreenerData.volume;
+                    const volumeScore = Math.min(100, Math.round((volume.h24 / 50000) * 100));
                     metrics.push({
                         name: "Trading Volume",
                         status: volumeScore > 80 ? "healthy" : volumeScore > 40 ? "warning" : "danger",
                         score: volumeScore,
-                        details: `1H: $${volume["1h"].toLocaleString()}<br>10M: $${volume["10m"].toLocaleString()}<br>5M: $${volume["5m"].toLocaleString()}`
+                        details: `
+                            5M: ${formatVolumeData(volume.m5)}<br>
+                            1H: ${formatVolumeData(volume.h1)}<br>
+                            6H: ${formatVolumeData(volume.h6)}<br>
+                            24H: ${formatVolumeData(volume.h24)}
+                        `
                     });
                 }
 
                 // Holder Analysis
                 if (solscanData?.holders) {
                     const holders = solscanData.holders;
-                    const topHoldersPercentage = holders.slice(0, 10).reduce((sum, holder) => sum + parseFloat(holder.share || 0), 0);
+                    const holderScore = Math.max(0, 100 - Math.round(holders.top10Percentage));
                     
                     metrics.push({
-                        name: "Top 10 Holders",
-                        status: topHoldersPercentage < 50 ? "healthy" : topHoldersPercentage < 70 ? "warning" : "danger",
-                        score: Math.max(0, 100 - Math.round(topHoldersPercentage)),
-                        details: `Hold ${topHoldersPercentage.toFixed(2)}% of supply`
+                        name: "Holder Distribution",
+                        status: holderScore > 70 ? "healthy" : holderScore > 40 ? "warning" : "danger",
+                        score: holderScore,
+                        details: `
+                            Total Holders: ${holders.total.toLocaleString()}<br>
+                            Top 10 Hold: ${holders.top10Percentage.toFixed(2)}%<br>
+                            Distribution:<br>
+                            ${holders.top10.map((holder, i) => 
+                                `#${i + 1}: ${holder.percentage.toFixed(2)}%`
+                            ).join('<br>')}
+                        `
                     });
                 }
 
                 // Contract Safety
                 if (solscanData?.metadata) {
-                    const hasVerifiedCode = solscanData.metadata.verifiedCreator || false;
-                    const hasWebsite = solscanData.metadata.website ? true : false;
-                    const safetyScore = (hasVerifiedCode ? 50 : 0) + (hasWebsite ? 30 : 0);
+                    const metadata = solscanData.metadata;
+                    const safetyScore = (metadata.verified ? 50 : 0) + (metadata.website ? 30 : 0);
                     
                     metrics.push({
                         name: "Contract Safety",
                         status: safetyScore > 70 ? "healthy" : safetyScore > 40 ? "warning" : "danger",
                         score: safetyScore,
-                        details: `${hasVerifiedCode ? '✓' : '✗'} Verified Code<br>${hasWebsite ? '✓' : '✗'} Website`
+                        details: `
+                            ${metadata.verified ? '✓' : '✗'} Verified Contract<br>
+                            ${metadata.website ? '✓' : '✗'} Website Present<br>
+                            ${metadata.website ? `Website: ${metadata.website}` : ''}
+                        `
                     });
                 }
 
                 // Display results
                 displayAnalysisResults({
-                    tokenName: solscanData?.metadata?.name || dexScreenerData?.baseToken?.name || "Unknown Token",
-                    tokenSymbol: solscanData?.metadata?.symbol || dexScreenerData?.baseToken?.symbol,
+                    tokenName: solscanData?.metadata?.name || dexScreenerData?.name || "Unknown Token",
+                    tokenSymbol: solscanData?.metadata?.symbol || dexScreenerData?.symbol,
                     metrics: metrics
                 });
 
