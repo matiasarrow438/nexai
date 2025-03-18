@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEX.AI Portal</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/png" href="favicon.png">
+    
+    <!-- Solana Dependencies -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <script src="https://unpkg.com/@solana/wallet-adapter-base"></script>
+    <script src="https://unpkg.com/@solana/wallet-adapter-wallets"></script>
+    <script src="https://unpkg.com/@solana/wallet-adapter-phantom"></script>
+</head>
+<body class="with-sidebar">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="logo-link">
+                <svg class="logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                            <feMerge>
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    
+                    <!-- Outer hexagon -->
+                    <path d="M50 20 L75 32.5 L75 67.5 L50 80 L25 67.5 L25 32.5 Z" 
+                          stroke="#00a2ff" 
+                          stroke-width="2"
+                          fill="none"
+                          stroke-linecap="round"
+                          filter="url(#glow)"/>
+                          
+                    <!-- Inner geometric pattern -->
+                    <path d="M50 35 L65 42.5 L65 57.5 L50 65 L35 57.5 L35 42.5 Z" 
+                          stroke="#00a2ff" 
+                          stroke-width="2"
+                          fill="none"
+                          stroke-linecap="round"
+                          filter="url(#glow)"/>
+                          
+                    <!-- Center connecting lines -->
+                    <path d="M50 35 L50 20 M35 42.5 L25 32.5 M65 42.5 L75 32.5" 
+                          stroke="#00a2ff" 
+                          stroke-width="2"
+                          fill="none"
+                          stroke-linecap="round"
+                          filter="url(#glow)"/>
+                </svg>
+            </a>
+            <button class="sidebar-toggle">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor" d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
+                </svg>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#dashboard" class="nav-item active" data-tab="dashboard">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+                <span class="nav-item-text">Dashboard</span>
+            </a>
+            <a href="#wallet" class="nav-item" data-tab="wallet">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor" d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+                </svg>
+                <span class="nav-item-text">Wallet</span>
+            </a>
+            <a href="#analytics" class="nav-item" data-tab="analytics">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                </svg>
+                <span class="nav-item-text">Analytics</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Tab -->
+        <div class="tab-content active" id="dashboard">
+            <div class="wallet-connection">
+                <h1>Connect Your Wallet</h1>
+                <p>Connect your Solana wallet to access the full features of the portal</p>
+                <button class="wallet-connect-btn" id="connectWalletBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M19 7h-1V6a3 3 0 0 0-3-3H5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-8a3 3 0 0 0-3-3zm-3-2v2H5a1 1 0 0 1 0-2h11zm4 12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V8.83A3 3 0 0 0 5 9h14a1 1 0 0 1 1 1v7z" fill="currentColor"/>
+                        <path d="M16 11.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" fill="currentColor"/>
+                    </svg>
+                    Connect Wallet
+                </button>
+                <div class="wallet-info" style="display: none;">
+                    <p>Connected: <span id="walletAddress"></span></p>
+                    <button class="wallet-connect-btn connected" id="disconnectWalletBtn">Disconnect</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wallet Tab -->
+        <div class="tab-content" id="wallet">
+            <div class="wallet-balance">
+                <h2>Wallet Balance</h2>
+                <p id="walletBalanceText">Please connect your wallet to view your balance</p>
+            </div>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div class="tab-content" id="analytics">
+            <div class="analytics-data">
+                <h2>Performance Metrics</h2>
+                <p id="analyticsText">Please connect your wallet to view analytics</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Error Message -->
+    <div class="error-message">
+        <svg viewBox="0 0 24 24" width="16" height="16">
+            <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        </svg>
+        <span>Please connect your wallet</span>
+    </div>
+
+    <script>
+        let wallet = null;
+        let connection = null;
+
+        async function initWallet() {
+            try {
+                // Initialize Solana connection
+                connection = new solanaWeb3.Connection(
+                    solanaWeb3.clusterApiUrl('devnet'),
+                    'confirmed'
+                );
+
+                // Check if Phantom is installed
+                const isPhantomInstalled = window.solana && window.solana.isPhantom;
+                
+                if (!isPhantomInstalled) {
+                    alert('Please install Phantom wallet to continue');
+                    return;
+                }
+
+                wallet = window.solana;
+
+                // Handle connection events
+                wallet.on('connect', () => updateWalletUI(true));
+                wallet.on('disconnect', () => updateWalletUI(false));
+
+                // Check if already connected
+                if (wallet.isConnected) {
+                    updateWalletUI(true);
+                }
+            } catch (err) {
+                console.error('Failed to initialize wallet:', err);
+                alert('Failed to initialize wallet. Please try again.');
+            }
+        }
+
+        async function updateWalletUI(isConnected) {
+            const connectBtn = document.getElementById('connectWalletBtn');
+            const walletInfo = document.querySelector('.wallet-info');
+            const walletAddress = document.getElementById('walletAddress');
+            
+            if (isConnected && wallet.publicKey) {
+                // Update UI for connected state
+                connectBtn.style.display = 'none';
+                walletInfo.style.display = 'block';
+                const address = wallet.publicKey.toString();
+                walletAddress.textContent = `${address.slice(0, 4)}...${address.slice(-4)}`;
+                
+                // Load wallet balance
+                loadWalletBalance();
+                
+                // Update error message
+                const errorMessage = document.querySelector('.error-message');
+                if (errorMessage) {
+                    errorMessage.style.display = 'none';
+                }
+            } else {
+                // Update UI for disconnected state
+                connectBtn.style.display = 'block';
+                walletInfo.style.display = 'none';
+                walletAddress.textContent = '';
+                
+                // Reset balance and analytics
+                document.getElementById('walletBalanceText').textContent = 'Please connect your wallet to view your balance';
+                document.getElementById('analyticsText').textContent = 'Please connect your wallet to view analytics';
+                
+                // Show error message
+                const errorMessage = document.querySelector('.error-message');
+                if (errorMessage) {
+                    errorMessage.style.display = 'flex';
+                }
+            }
+        }
+
+        async function loadWalletBalance() {
+            try {
+                const balance = await connection.getBalance(wallet.publicKey);
+                const solBalance = balance / solanaWeb3.LAMPORTS_PER_SOL;
+                document.getElementById('walletBalanceText').textContent = `${solBalance.toFixed(4)} SOL`;
+                document.getElementById('analyticsText').textContent = 'Analytics data loading...';
+            } catch (err) {
+                console.error('Failed to load balance:', err);
+                document.getElementById('walletBalanceText').textContent = 'Failed to load balance';
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('connectWalletBtn').addEventListener('click', async () => {
+            try {
+                await wallet.connect();
+            } catch (err) {
+                console.error('Failed to connect wallet:', err);
+                alert('Failed to connect wallet. Please try again.');
+            }
+        });
+
+        document.getElementById('disconnectWalletBtn').addEventListener('click', async () => {
+            try {
+                await wallet.disconnect();
+            } catch (err) {
+                console.error('Failed to disconnect wallet:', err);
+                alert('Failed to disconnect wallet. Please try again.');
+            }
+        });
+
+        // Initialize wallet when page loads
+        window.addEventListener('load', initWallet);
+
+        // Sidebar toggle functionality
+        document.querySelector('.sidebar-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('sidebar-collapsed');
+        });
+
+        // Tab functionality
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tabId = item.getAttribute('data-tab');
+                
+                // Update active tab
+                document.querySelectorAll('.nav-item').forEach(navItem => {
+                    navItem.classList.remove('active');
+                });
+                item.classList.add('active');
+                
+                // Show active content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

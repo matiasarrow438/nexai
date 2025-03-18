@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="400" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <filter id="glow">
+            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+            <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+    
+    <!-- Outer hexagon -->
+    <path d="M50 20 L75 32.5 L75 67.5 L50 80 L25 67.5 L25 32.5 Z" 
+          stroke="#00a2ff" 
+          stroke-width="2.5"
+          fill="none"
+          stroke-linecap="round"
+          filter="url(#glow)"
+          opacity="0.9"/>
+          
+    <!-- Inner geometric pattern -->
+    <path d="M50 35 L65 42.5 L65 57.5 L50 65 L35 57.5 L35 42.5 Z" 
+          stroke="#00a2ff" 
+          stroke-width="2.5"
+          fill="none"
+          stroke-linecap="round"
+          filter="url(#glow)"
+          opacity="0.95"/>
+          
+    <!-- Center connecting lines -->
+    <path d="M50 35 L50 20 M35 42.5 L25 32.5 M65 42.5 L75 32.5" 
+          stroke="#00a2ff" 
+          stroke-width="2.5"
+          fill="none"
+          stroke-linecap="round"
+          filter="url(#glow)"
+          opacity="0.9"/>
+</svg> 
