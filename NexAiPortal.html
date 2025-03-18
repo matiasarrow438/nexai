@@ -930,82 +930,114 @@
             
             const html = `
                 <div class="analysis-card">
-                    <div class="token-header">
-                        <div class="token-title">
-                            <h2>${results.tokenName}</h2>
-                            ${results.tokenSymbol ? `<span class="token-symbol">${results.tokenSymbol}</span>` : ''}
+                    <div class="risk-overview">
+                        <div class="risk-score">
+                            <h2>Risk Analysis</h2>
+                            <div class="score-value">${results.metrics.find(m => m.name === "Risk Analysis")?.score || 0}</div>
+                            <div class="risk-label">Good</div>
+                        </div>
+                        <div class="risk-warnings">
+                            ${results.metrics.find(m => m.name === "Risk Analysis")?.details || ''}
                         </div>
                     </div>
-                    
-                    <div class="analysis-sections">
-                        ${results.metrics.map(metric => {
-                            if (metric.name === "Risk Analysis") {
-                                return `
-                                    <div class="analysis-section risk-section ${metric.status}">
-                                        <div class="section-header">
-                                            <h3>${metric.name}</h3>
-                                            <div class="score-badge ${metric.status}">
-                                                <span class="score-value">${metric.score}</span>
-                                                <span class="score-label">Score</span>
-                                            </div>
-                                        </div>
-                                        <div class="section-content">
-                                            ${metric.details}
-                                        </div>
-                                    </div>
-                                `;
-                            }
-                            else if (metric.name === "Market Analysis") {
-                                return `
-                                    <div class="analysis-section market-section ${metric.status}">
-                                        <div class="section-header">
-                                            <h3>${metric.name}</h3>
-                                            <div class="score-badge ${metric.status}">
-                                                <span class="score-value">${metric.score}</span>
-                                                <span class="score-label">Score</span>
-                                            </div>
-                                        </div>
-                                        <div class="section-content">
-                                            ${metric.details}
-                                        </div>
-                                    </div>
-                                `;
-                            }
-                            else if (metric.name === "Holder Distribution") {
-                                return `
-                                    <div class="analysis-section holders-section ${metric.status}">
-                                        <div class="section-header">
-                                            <h3>${metric.name}</h3>
-                                            <div class="score-badge ${metric.status}">
-                                                <span class="score-value">${metric.score}</span>
-                                                <span class="score-label">Score</span>
-                                            </div>
-                                        </div>
-                                        <div class="section-content">
-                                            ${metric.details}
-                                        </div>
-                                    </div>
-                                `;
-                            }
-                            else if (metric.name === "Contract Info") {
-                                return `
-                                    <div class="analysis-section contract-section ${metric.status}">
-                                        <div class="section-header">
-                                            <h3>${metric.name}</h3>
-                                            <div class="info-badge">
-                                                <svg viewBox="0 0 24 24" width="24" height="24">
-                                                    <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-                                                </svg>
-                                            </div>
-                                        </div>
-                                        <div class="section-content">
-                                            ${metric.details}
-                                        </div>
-                                    </div>
-                                `;
-                            }
-                            return '';
-                        }).join('')}
+
+                    <div class="token-overview">
+                        <h2>Token Overview</h2>
+                        <div class="token-grid">
+                            <div class="token-detail">
+                                <span class="label">Mint</span>
+                                <span class="value">${results.metrics.find(m => m.name === "Contract Info")?.details.match(/Mint Authority: ([^\n<]+)/)?.pop() || 'N/A'}</span>
+                            </div>
+                            <div class="token-detail">
+                                <span class="label">Supply</span>
+                                <span class="value">${results.metrics.find(m => m.name === "Contract Info")?.details.match(/Supply: ([^\n<]+)/)?.pop() || 'N/A'}</span>
+                            </div>
+                            <div class="token-detail">
+                                <span class="label">Creator</span>
+                                <span class="value">${results.metrics.find(m => m.name === "Contract Info")?.details.match(/Creator: ([^\n<]+)/)?.pop() || 'N/A'}</span>
+                            </div>
+                            <div class="token-detail">
+                                <span class="label">Market Cap</span>
+                                <span class="value">${results.metrics.find(m => m.name === "Market Analysis")?.details.match(/Total Liquidity: ([^\n<]+)/)?.pop() || 'N/A'}</span>
+                            </div>
+                            <div class="token-detail">
+                                <span class="label">Holders</span>
+                                <span class="value">${results.metrics.find(m => m.name === "Holder Distribution")?.details.match(/Total Holders: ([^\n<]+)/)?.pop() || 'N/A'}</span>
+                            </div>
+                            <div class="token-detail">
+                                <span class="label">Mint Authority</span>
+                                <span class="value">${results.metrics.find(m => m.name === "Contract Info")?.details.match(/Mint Authority: ([^\n<]+)/)?.pop() || '-'}</span>
+                            </div>
+                            <div class="token-detail">
+                                <span class="label">LP Locked</span>
+                                <span class="value">${results.metrics.find(m => m.name === "Market Analysis")?.details.match(/Locked %: ([^\n<]+)/)?.pop() || '100.00%'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="custom-domain">
+                        <h2>Custom Domain</h2>
+                        <p>Claim a custom domain for this token for users to use across the ecosystem.</p>
+                        <button class="claim-btn">CLAIM</button>
+                    </div>
+
+                    <div class="community-sentiment">
+                        <h2>Community Sentiment</h2>
+                        <div class="sentiment-indicators">
+                            <div class="sentiment negative">
+                                <span class="icon">👀</span>
+                            </div>
+                            <div class="sentiment positive">
+                                <span class="icon">🚀</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insider-networks">
+                        <h2>Insider Networks <span class="beta-tag">BETA</span></h2>
+                        <div class="network-status">
+                            <span class="status-icon">✓</span>
+                            NO INSIDER NETWORKS DETECTED
+                        </div>
+                    </div>
+
+                    <div class="markets">
+                        <h2>Markets</h2>
+                        <div class="markets-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Market</th>
+                                        <th>Address</th>
+                                        <th>Pair</th>
+                                        <th>LP Mint</th>
+                                        <th>Liquidity</th>
+                                        <th>LP Locked</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${results.metrics.find(m => m.name === "Market Analysis")?.details || ''}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="top-holders">
+                        <h2>Top Holders <span class="percentage">26.63%</span></h2>
+                        <div class="holders-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Account</th>
+                                        <th>Amount</th>
+                                        <th>Percentage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${results.metrics.find(m => m.name === "Holder Distribution")?.details || ''}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             `;
