@@ -1529,3 +1529,75 @@ tr:hover td {
     font-size: 14px;
     font-weight: 500;
 }
+
+.holder-tag {
+    display: inline-block;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    background: rgba(0, 162, 255, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-top: 4px;
+    border: 1px solid rgba(0, 162, 255, 0.2);
+}
+
+.holder-type {
+    display: inline-block;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(0, 162, 255, 0.1);
+    color: var(--primary-color);
+    border: 1px solid rgba(0, 162, 255, 0.2);
+}
+
+/* Risk item improvements */
+.risk-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.risk-score-impact {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 2px 8px;
+    background: rgba(0, 162, 255, 0.1);
+    border-radius: 4px;
+    display: inline-block;
+    margin-top: 4px;
+}
+
+/* Improve table responsiveness */
+@media (max-width: 768px) {
+    .markets-table, .holders-table {
+        margin: 0 -20px;
+        width: calc(100% + 40px);
+        border-radius: 0;
+    }
+
+    td, th {
+        padding: 12px;
+        font-size: 13px;
+    }
+
+    .token-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+}
+
+/* Animation for status changes */
+.risk-label, .bundle-status, .token-detail {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
