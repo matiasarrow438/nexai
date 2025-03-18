@@ -634,40 +634,140 @@
         // Start with fast updates (every 2 seconds)
         const updateInterval = setInterval(updateTokenAnalytics, 2000);
 
-        // Add token analysis function
+        // Add these functions before the analyzeToken function
+        async function fetchDexScreenerData(address) {
+            try {
+                const response = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${address}`);
+                const data = await response.json();
+                return data.pairs?.[0]; // Get the most liquid pair
+            } catch (err) {
+                console.error('Failed to fetch DexScreener data:', err);
+                return null;
+            }
+        }
+
+        async function fetchSolscanData(address) {
+            try {
+                const [holdersResponse, metadataResponse] = await Promise.all([
+                    fetch(`https://public-api.solscan.io/token/holders?tokenAddress=${address}&limit=10&offset=0`),
+                    fetch(`https://public-api.solscan.io/token/meta?tokenAddress=${address}`)
+                ]);
+                
+                const holdersData = await holdersResponse.json();
+                const metadata = await metadataResponse.json();
+                
+                return {
+                    holders: holdersData.data,
+                    metadata: metadata
+                };
+            } catch (err) {
+                console.error('Failed to fetch Solscan data:', err);
+                return null;
+            }
+        }
+
+        // Update the analyzeToken function
         async function analyzeToken(address) {
             try {
                 // Show loading state
                 const resultsDiv = document.getElementById('analysisResults');
                 resultsDiv.innerHTML = '<div class="loading">Analyzing token...</div>';
 
-                // Here we'll add the actual token analysis logic
-                // For now, showing a placeholder
-                const analysisResults = {
-                    tokenName: "Sample Token",
-                    metrics: [
-                        { name: "Liquidity", status: "healthy", score: 85 },
-                        { name: "Holder Distribution", status: "warning", score: 65 },
-                        { name: "Trading Volume", status: "healthy", score: 90 },
-                        { name: "Contract Safety", status: "danger", score: 30 }
-                    ]
-                };
+                // Fetch data from both APIs
+                const [dexScreenerData, solscanData] = await Promise.all([
+                    fetchDexScreenerData(address),
+                    fetchSolscanData(address)
+                ]);
+
+                if (!dexScreenerData && !solscanData) {
+                    throw new Error('Failed to fetch token data');
+                }
+
+                // Calculate metrics
+                const metrics = [];
+
+                // Liquidity Analysis
+                if (dexScreenerData) {
+                    const liquidity = parseFloat(dexScreenerData.liquidity?.usd || 0);
+                    metrics.push({
+                        name: "Liquidity",
+                        status: liquidity > 100000 ? "healthy" : liquidity > 50000 ? "warning" : "danger",
+                        score: Math.min(100, Math.round((liquidity / 100000) * 100)),
+                        details: `$${liquidity.toLocaleString()}`
+                    });
+
+                    // Volume Analysis (5m/10m/1h)
+                    const volume = {
+                        "5m": parseFloat(dexScreenerData.volume?.m5 || 0),
+                        "10m": parseFloat(dexScreenerData.volume?.m10 || 0),
+                        "1h": parseFloat(dexScreenerData.volume?.h1 || 0)
+                    };
+
+                    const volumeScore = Math.min(100, Math.round((volume["1h"] / 10000) * 100));
+                    metrics.push({
+                        name: "Trading Volume",
+                        status: volumeScore > 80 ? "healthy" : volumeScore > 40 ? "warning" : "danger",
+                        score: volumeScore,
+                        details: `1H: $${volume["1h"].toLocaleString()}<br>10M: $${volume["10m"].toLocaleString()}<br>5M: $${volume["5m"].toLocaleString()}`
+                    });
+                }
+
+                // Holder Analysis
+                if (solscanData?.holders) {
+                    const holders = solscanData.holders;
+                    const topHoldersPercentage = holders.slice(0, 10).reduce((sum, holder) => sum + parseFloat(holder.share || 0), 0);
+                    
+                    metrics.push({
+                        name: "Top 10 Holders",
+                        status: topHoldersPercentage < 50 ? "healthy" : topHoldersPercentage < 70 ? "warning" : "danger",
+                        score: Math.max(0, 100 - Math.round(topHoldersPercentage)),
+                        details: `Hold ${topHoldersPercentage.toFixed(2)}% of supply`
+                    });
+                }
+
+                // Contract Safety
+                if (solscanData?.metadata) {
+                    const hasVerifiedCode = solscanData.metadata.verifiedCreator || false;
+                    const hasWebsite = solscanData.metadata.website ? true : false;
+                    const safetyScore = (hasVerifiedCode ? 50 : 0) + (hasWebsite ? 30 : 0);
+                    
+                    metrics.push({
+                        name: "Contract Safety",
+                        status: safetyScore > 70 ? "healthy" : safetyScore > 40 ? "warning" : "danger",
+                        score: safetyScore,
+                        details: `${hasVerifiedCode ? '✓' : '✗'} Verified Code<br>${hasWebsite ? '✓' : '✗'} Website`
+                    });
+                }
 
                 // Display results
-                displayAnalysisResults(analysisResults);
+                displayAnalysisResults({
+                    tokenName: solscanData?.metadata?.name || dexScreenerData?.baseToken?.name || "Unknown Token",
+                    tokenSymbol: solscanData?.metadata?.symbol || dexScreenerData?.baseToken?.symbol,
+                    metrics: metrics
+                });
+
             } catch (err) {
                 console.error('Failed to analyze token:', err);
-                showErrorNotification('Failed to analyze token. Please try again.');
+                resultsDiv.innerHTML = `
+                    <div class="analysis-error">
+                        <svg viewBox="0 0 24 24" width="24" height="24">
+                            <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                        </svg>
+                        <p>Failed to analyze token. Please verify the contract address and try again.</p>
+                    </div>
+                `;
             }
         }
 
-        // Add function to display analysis results
+        // Update the displayAnalysisResults function
         function displayAnalysisResults(results) {
             const resultsDiv = document.getElementById('analysisResults');
             
             const html = `
                 <div class="analysis-card">
-                    <h3>${results.tokenName}</h3>
+                    <div class="token-header">
+                        <h3>${results.tokenName} ${results.tokenSymbol ? `(${results.tokenSymbol})` : ''}</h3>
+                    </div>
                     <div class="metrics-grid">
                         ${results.metrics.map(metric => `
                             <div class="metric-card ${metric.status}">
@@ -676,6 +776,7 @@
                                     <span>${metric.score}</span>
                                 </div>
                                 <p class="status-text">${metric.status.charAt(0).toUpperCase() + metric.status.slice(1)}</p>
+                                ${metric.details ? `<div class="metric-details">${metric.details}</div>` : ''}
                             </div>
                         `).join('')}
                     </div>
