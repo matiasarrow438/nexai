@@ -85,9 +85,22 @@
 
     <!-- Main Content -->
     <main class="main-content">
+        <!-- Add this right after <main class="main-content"> -->
+        <div class="top-bar">
+            <div class="wallet-status" style="display: none;">
+                <span id="walletAddressShort"></span>
+                <button class="disconnect-btn" id="disconnectWalletBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M16 13v-2H7V8l-5 4 5 4v-3h9zm-1-7h6v12h-6v2h6a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-6v2z" fill="currentColor"/>
+                    </svg>
+                    Disconnect
+                </button>
+            </div>
+        </div>
+
         <!-- Dashboard Tab -->
         <div class="tab-content active" id="dashboard">
-            <div class="wallet-connection">
+            <div class="wallet-connection" id="walletConnectionSection">
                 <div class="wallet-icon">
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
                         <path d="M19 7h-1V6a3 3 0 0 0-3-3H5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-8a3 3 0 0 0-3-3zm-3-2v2H5a1 1 0 0 1 0-2h11zm4 12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V8.83A3 3 0 0 0 5 9h14a1 1 0 0 1 1 1v7z" fill="currentColor"/>
@@ -105,9 +118,26 @@
                         <span id="walletButtonText">Connect Wallet</span>
                     </button>
                 </div>
-                <div class="wallet-info" style="display: none;">
-                    <p>Connected: <span id="walletAddress"></span></p>
-                    <button class="wallet-connect-btn connected" id="disconnectWalletBtn">Disconnect</button>
+            </div>
+
+            <!-- Token Analysis Section (shown after wallet connection) -->
+            <div class="token-analysis" id="tokenAnalysisSection" style="display: none;">
+                <div class="token-input-section">
+                    <h2>Token Analysis</h2>
+                    <p>Enter a token contract address to analyze its health and investment potential</p>
+                    <div class="token-input-container">
+                        <input type="text" id="tokenAddress" placeholder="Enter token contract address" class="token-input">
+                        <button class="analyze-btn" id="analyzeTokenBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z" fill="currentColor"/>
+                            </svg>
+                            Analyze
+                        </button>
+                    </div>
+                </div>
+
+                <div class="analysis-results" id="analysisResults">
+                    <!-- Results will be populated here -->
                 </div>
             </div>
         </div>
@@ -303,17 +333,20 @@
         }
 
         async function updateWalletUI(isConnected) {
-            const connectBtn = document.getElementById('connectWalletBtn');
-            const walletInfo = document.querySelector('.wallet-info');
-            const walletAddress = document.getElementById('walletAddress');
-            const walletButtonContainer = document.querySelector('.wallet-button-container');
+            const walletConnectionSection = document.getElementById('walletConnectionSection');
+            const tokenAnalysisSection = document.getElementById('tokenAnalysisSection');
+            const walletStatus = document.querySelector('.wallet-status');
+            const walletAddressShort = document.getElementById('walletAddressShort');
             
             if (isConnected && wallet.publicKey) {
-                // Update UI for connected state
-                walletButtonContainer.style.display = 'none';
-                walletInfo.style.display = 'block';
+                // Hide connection section, show analysis section
+                walletConnectionSection.style.display = 'none';
+                tokenAnalysisSection.style.display = 'block';
+                
+                // Show wallet status in top right
+                walletStatus.style.display = 'flex';
                 const address = wallet.publicKey.toString();
-                walletAddress.textContent = `${address.slice(0, 4)}...${address.slice(-4)}`;
+                walletAddressShort.textContent = `${address.slice(0, 4)}...${address.slice(-4)}`;
                 
                 // Store connection state
                 localStorage.setItem('walletAutoConnect', 'true');
@@ -330,10 +363,13 @@
                 // Update analytics when wallet is connected
                 updateTokenAnalytics();
             } else {
-                // Update UI for disconnected state
-                walletButtonContainer.style.display = 'block';
-                walletInfo.style.display = 'none';
-                walletAddress.textContent = '';
+                // Show connection section, hide analysis section
+                walletConnectionSection.style.display = 'block';
+                tokenAnalysisSection.style.display = 'none';
+                
+                // Hide wallet status
+                walletStatus.style.display = 'none';
+                walletAddressShort.textContent = '';
                 
                 // Clear stored connection state
                 localStorage.removeItem('walletAutoConnect');
@@ -597,6 +633,67 @@
 
         // Start with fast updates (every 2 seconds)
         const updateInterval = setInterval(updateTokenAnalytics, 2000);
+
+        // Add token analysis function
+        async function analyzeToken(address) {
+            try {
+                // Show loading state
+                const resultsDiv = document.getElementById('analysisResults');
+                resultsDiv.innerHTML = '<div class="loading">Analyzing token...</div>';
+
+                // Here we'll add the actual token analysis logic
+                // For now, showing a placeholder
+                const analysisResults = {
+                    tokenName: "Sample Token",
+                    metrics: [
+                        { name: "Liquidity", status: "healthy", score: 85 },
+                        { name: "Holder Distribution", status: "warning", score: 65 },
+                        { name: "Trading Volume", status: "healthy", score: 90 },
+                        { name: "Contract Safety", status: "danger", score: 30 }
+                    ]
+                };
+
+                // Display results
+                displayAnalysisResults(analysisResults);
+            } catch (err) {
+                console.error('Failed to analyze token:', err);
+                showErrorNotification('Failed to analyze token. Please try again.');
+            }
+        }
+
+        // Add function to display analysis results
+        function displayAnalysisResults(results) {
+            const resultsDiv = document.getElementById('analysisResults');
+            
+            const html = `
+                <div class="analysis-card">
+                    <h3>${results.tokenName}</h3>
+                    <div class="metrics-grid">
+                        ${results.metrics.map(metric => `
+                            <div class="metric-card ${metric.status}">
+                                <h4>${metric.name}</h4>
+                                <div class="score-circle">
+                                    <span>${metric.score}</span>
+                                </div>
+                                <p class="status-text">${metric.status.charAt(0).toUpperCase() + metric.status.slice(1)}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        // Add event listener for token analysis
+        document.getElementById('analyzeTokenBtn').addEventListener('click', () => {
+            const address = document.getElementById('tokenAddress').value.trim();
+            if (address) {
+                analyzeToken(address);
+            } else {
+                showErrorNotification('Please enter a valid token address');
+            }
+        });
     </script>
 </body>
 </html>
