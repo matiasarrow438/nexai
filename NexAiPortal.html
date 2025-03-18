@@ -920,7 +920,7 @@
             const html = `
                 <div class="analysis-card">
                     <div class="risk-overview">
-                        <div class="risk-score">
+                        <div class="section-header">
                             <h2>Risk Analysis</h2>
                             <div class="risk-label ${riskScale.class}">
                                 ${riskScale.text}
@@ -933,7 +933,9 @@
                     </div>
 
                     <div class="bundle-info">
-                        <h2>Bundle Status</h2>
+                        <div class="section-header">
+                            <h2>Bundle Status</h2>
+                        </div>
                         <div class="bundle-details">
                             ${results.bundleData ? `
                                 <div class="bundle-status ${results.bundleData.is_bundled ? 'bundled' : 'not-bundled'}">
@@ -954,7 +956,9 @@
                     </div>
 
                     <div class="token-overview">
-                        <h2>Token Overview</h2>
+                        <div class="section-header">
+                            <h2>Token Overview</h2>
+                        </div>
                         <div class="token-grid">
                             <div class="token-detail">
                                 <span class="label">Name</span>
@@ -984,7 +988,9 @@
                     </div>
 
                     <div class="markets">
-                        <h2>Markets</h2>
+                        <div class="section-header">
+                            <h2>Markets</h2>
+                        </div>
                         <div class="markets-table">
                             <table>
                                 <thead>
@@ -1001,7 +1007,7 @@
                                     ${rugCheckData?.markets?.map(market => `
                                         <tr>
                                             <td>${market.name || 'Unknown'}</td>
-                                            <td>${market.address ? `${market.address.substring(0, 6)}...${market.address.substring(market.address.length - 4)}` : 'N/A'}</td>
+                                            <td>${market.address ? `<a href="https://solscan.io/account/${market.address}" target="_blank">${market.address.substring(0, 6)}...${market.address.substring(market.address.length - 4)}</a>` : 'N/A'}</td>
                                             <td>${market.pair || 'N/A'}</td>
                                             <td>${market.lpMint || 'N/A'}</td>
                                             <td>${formatVolumeData(market.liquidity) || 'N/A'}</td>
@@ -1014,9 +1020,11 @@
                     </div>
 
                     <div class="top-holders">
-                        <h2>Top Holders <span class="percentage">${rugCheckData?.topHolders ? 
-                            (rugCheckData.topHolders.slice(0, 10).reduce((sum, holder) => sum + (holder.pct || 0), 0)).toFixed(2) + '%'
-                            : '0%'}</span></h2>
+                        <div class="section-header">
+                            <h2>Top Holders <span class="percentage">${rugCheckData?.topHolders ? 
+                                (rugCheckData.topHolders.slice(0, 10).reduce((sum, holder) => sum + (holder.pct || 0), 0)).toFixed(2) + '%'
+                                : '0%'}</span></h2>
+                        </div>
                         <div class="holders-table">
                             <table>
                                 <thead>
@@ -1036,11 +1044,11 @@
                                                     <a href="https://solscan.io/account/${holder.owner}" target="_blank">
                                                         ${holder.owner.substring(0, 6)}...${holder.owner.substring(holder.owner.length - 4)}
                                                     </a>
-                                                    ${isKnown ? `<br><small>(${isKnown.name})</small>` : ''}
+                                                    ${isKnown ? `<div class="holder-tag">${isKnown.name}</div>` : ''}
                                                 </td>
                                                 <td>${holder.uiAmount?.toLocaleString() || '0'}</td>
                                                 <td>${holder.pct?.toFixed(2) || '0'}%</td>
-                                                <td>${isKnown ? isKnown.type : '-'}</td>
+                                                <td>${isKnown ? `<span class="holder-type">${isKnown.type}</span>` : '-'}</td>
                                             </tr>
                                         `;
                                     }).join('') || '<tr><td colspan="4">No holder data available</td></tr>'}
