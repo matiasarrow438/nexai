@@ -731,18 +731,41 @@
             }).format(volume);
         }
 
+        async function fetchRugCheckData(address) {
+            try {
+                const response = await fetch(`https://api.rugcheck.xyz/v1/tokens/${address}/report`);
+                if (!response.ok) throw new Error('RugCheck API request failed');
+                const data = await response.json();
+                return {
+                    score: data.score || 0,
+                    normalizedScore: data.score_normalised || 0,
+                    risks: data.risks || [],
+                    totalHolders: data.totalHolders || 0,
+                    topHolders: data.topHolders || [],
+                    markets: data.markets || [],
+                    totalMarketLiquidity: data.totalMarketLiquidity || 0,
+                    rugged: data.rugged || false,
+                    transferFee: data.transferFee || { pct: 0, maxAmount: 0 }
+                };
+            } catch (err) {
+                console.error('Failed to fetch RugCheck data:', err);
+                return null;
+            }
+        }
+
         // Update the analyzeToken function
         async function analyzeToken(address) {
             try {
                 const resultsDiv = document.getElementById('analysisResults');
                 resultsDiv.innerHTML = '<div class="loading">Analyzing token...</div>';
 
-                const [dexScreenerData, solscanData] = await Promise.all([
+                const [dexScreenerData, solscanData, rugCheckData] = await Promise.all([
                     fetchDexScreenerData(address),
-                    fetchSolscanData(address)
+                    fetchSolscanData(address),
+                    fetchRugCheckData(address)
                 ]);
 
-                if (!dexScreenerData && !solscanData) {
+                if (!dexScreenerData && !solscanData && !rugCheckData) {
                     throw new Error('Failed to fetch token data');
                 }
 
@@ -753,10 +776,43 @@
                 // Check if token name ends with "pump" for liquidity lock status
                 const isPumpToken = tokenName.toLowerCase().endsWith('pump');
 
+                // Risk Analysis from RugCheck
+                if (rugCheckData) {
+                    const riskScore = rugCheckData.normalizedScore;
+                    metrics.push({
+                        name: "Risk Analysis",
+                        status: riskScore > 70 ? "healthy" : riskScore > 40 ? "warning" : "danger",
+                        score: riskScore,
+                        details: `
+                            <div class="risk-analysis">
+                                <div class="risk-header">
+                                    <strong>Risk Score:</strong> ${riskScore}/100<br>
+                                    <strong>Rugged:</strong> ${rugCheckData.rugged ? '⚠️ Yes' : '✅ No'}<br>
+                                    ${rugCheckData.transferFee.pct > 0 ? 
+                                        `<strong>Transfer Fee:</strong> ${rugCheckData.transferFee.pct}%<br>` : ''}
+                                </div>
+                                ${rugCheckData.risks.length > 0 ? `
+                                    <div class="risk-warnings">
+                                        <strong>Risk Warnings:</strong><br>
+                                        ${rugCheckData.risks.map(risk => `
+                                            <div class="risk-item ${risk.level}">
+                                                • ${risk.name}${risk.description ? `: ${risk.description}` : ''}
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : ''}
+                                <div class="market-info">
+                                    <strong>Total Market Liquidity:</strong> ${formatVolumeData(rugCheckData.totalMarketLiquidity)}<br>
+                                    <strong>Total Holders:</strong> ${rugCheckData.totalHolders?.toLocaleString() || 'N/A'}
+                                </div>
+                            </div>
+                        `
+                    });
+                }
+
                 // Liquidity Analysis
                 if (dexScreenerData?.liquidity) {
                     const liquidity = dexScreenerData.liquidity;
-                    // Override isLocked if it's a pump token
                     if (isPumpToken) {
                         liquidity.isLocked = true;
                         liquidity.lockedPercentage = 100;
