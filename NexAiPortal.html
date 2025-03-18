@@ -951,11 +951,39 @@
                                         <span class="status-label">${results.bundleData.is_bundled ? 'BUNDLED' : 'NOT BUNDLED'}</span>
                                         ${results.bundleData.is_bundled ? `
                                             <div class="bundle-details-text">
-                                                <p>Bundle Size: ${results.bundleData.bundle_size}</p>
-                                                <p>Bundle Type: ${results.bundleData.bundle_type}</p>
-                                                ${results.bundleData.bundle_expiry ? `<p>Expires: ${new Date(results.bundleData.bundle_expiry).toLocaleDateString()}</p>` : ''}
+                                                <div class="bundle-stat">
+                                                    <span class="stat-label">Bundle Size:</span>
+                                                    <span class="stat-value">${results.bundleData.bundle_size}</span>
+                                                </div>
+                                                <div class="bundle-stat">
+                                                    <span class="stat-label">Bundle Type:</span>
+                                                    <span class="stat-value">${results.bundleData.bundle_type}</span>
+                                                </div>
+                                                ${results.bundleData.bundle_expiry ? `
+                                                    <div class="bundle-stat">
+                                                        <span class="stat-label">Expiry Date:</span>
+                                                        <span class="stat-value">${new Date(results.bundleData.bundle_expiry).toLocaleDateString()}</span>
+                                                    </div>
+                                                    <div class="bundle-stat">
+                                                        <span class="stat-label">Time Until Expiry:</span>
+                                                        <span class="stat-value">${getTimeUntilExpiry(results.bundleData.bundle_expiry)}</span>
+                                                    </div>
+                                                ` : ''}
+                                                <div class="bundle-stat">
+                                                    <span class="stat-label">Status:</span>
+                                                    <span class="stat-value ${results.bundleData.is_bundled ? 'active' : 'inactive'}">
+                                                        ${results.bundleData.is_bundled ? 'Active' : 'Inactive'}
+                                                    </span>
+                                                </div>
                                             </div>
-                                        ` : ''}
+                                        ` : `
+                                            <div class="bundle-details-text">
+                                                <div class="bundle-stat">
+                                                    <span class="stat-label">Status:</span>
+                                                    <span class="stat-value inactive">Not Bundled</span>
+                                                </div>
+                                            </div>
+                                        `}
                                     </div>
                                 </div>
                             ` : '<div class="bundle-error">Unable to fetch bundle information</div>'}
@@ -1067,6 +1095,24 @@
             `;
             
             resultsDiv.innerHTML = html;
+        }
+
+        // Add this helper function before displayAnalysisResults
+        function getTimeUntilExpiry(expiryDate) {
+            const now = new Date();
+            const expiry = new Date(expiryDate);
+            const diff = expiry - now;
+            
+            if (diff <= 0) return 'Expired';
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            if (days > 0) return `${days} days remaining`;
+            if (hours > 0) return `${hours} hours remaining`;
+            if (minutes > 0) return `${minutes} minutes remaining`;
+            return 'Less than a minute remaining';
         }
 
         // Add this at the beginning of your script section
