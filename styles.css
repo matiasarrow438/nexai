@@ -1181,44 +1181,44 @@ footer {
 }
 
 .analysis-card {
+    max-width: 1200px;
+    margin: 24px auto;
+    padding: 24px;
     background: #0a0a0a;
     border-radius: 12px;
-    padding: 24px;
-    display: grid;
-    gap: 24px;
-    color: #fff;
-    max-width: 1200px;
-    margin: 0 auto;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-.risk-overview {
+.risk-overview, .bundle-info, .token-overview, .markets, .top-holders {
     background: #111111;
     border: 1px solid #222;
     border-radius: 12px;
     padding: 24px;
+    margin-bottom: 24px;
+}
+
+h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 24px;
+    letter-spacing: -0.02em;
 }
 
 .risk-score {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    text-align: center;
-}
-
-.risk-score h2 {
-    font-size: 20px;
-    margin-bottom: 16px;
-    color: #fff;
+    justify-content: space-between;
+    margin-bottom: 24px;
 }
 
 .risk-label {
-    display: inline-block;
-    padding: 12px 48px;
+    padding: 8px 16px;
     border-radius: 8px;
-    font-size: 16px;
     font-weight: 600;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    font-size: 14px;
 }
 
 .risk-label.terrible {
@@ -1245,205 +1245,54 @@ footer {
     border: 1px solid #00ffff;
 }
 
+.risk-reason {
+    font-size: 12px;
+    font-weight: normal;
+    opacity: 0.8;
+    margin-top: 8px;
+    text-transform: none;
+    letter-spacing: normal;
+    color: inherit;
+}
+
 .risk-warnings {
-    margin-top: 24px;
-    padding: 16px;
     background: #1a1a1a;
     border-radius: 8px;
-    color: #ff8800;
+    padding: 16px;
     font-size: 14px;
     line-height: 1.6;
-}
-
-.token-overview {
-    background: #111111;
-    border: 1px solid #222;
-    border-radius: 12px;
-    padding: 24px;
-}
-
-.token-overview h2 {
-    font-size: 20px;
-    margin-bottom: 24px;
     color: #fff;
 }
 
-.token-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
+.risk-item {
+    margin: 8px 0;
+    padding: 12px;
+    border-radius: 6px;
+    border-left: 4px solid;
 }
 
-.token-detail {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    background: #1a1a1a;
-    padding: 16px;
-    border-radius: 8px;
+.risk-item.high {
+    background: #1a0000;
+    border-left-color: #ff0000;
 }
 
-.token-detail .label {
-    color: #888;
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+.risk-item.medium {
+    background: #1a1100;
+    border-left-color: #ff8800;
 }
 
-.token-detail .value {
-    color: #fff;
-    font-size: 15px;
-    word-break: break-all;
-    font-family: 'Courier New', monospace;
-}
-
-.custom-domain {
-    background: #000;
-    border: 1px solid #1a1a1a;
-    border-radius: 8px;
-    padding: 20px;
-    text-align: center;
-}
-
-.custom-domain h2 {
-    font-size: 18px;
-    margin-bottom: 10px;
-}
-
-.custom-domain p {
-    color: #666;
-    font-size: 14px;
-    margin-bottom: 15px;
-}
-
-.claim-btn {
-    background: #00a352;
-    color: #fff;
-    border: none;
-    padding: 8px 24px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.community-sentiment {
-    background: #000;
-    border: 1px solid #1a1a1a;
-    border-radius: 8px;
-    padding: 20px;
-}
-
-.community-sentiment h2 {
-    font-size: 18px;
-    margin-bottom: 20px;
-}
-
-.sentiment-indicators {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-.sentiment {
-    padding: 20px;
-    border-radius: 4px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.sentiment.negative {
-    background: #ff000d1a;
-}
-
-.sentiment.positive {
-    background: #00a3521a;
-}
-
-.markets, .top-holders {
-    background: #111111;
-    border: 1px solid #222;
-    border-radius: 12px;
-    padding: 24px;
-}
-
-.markets h2, .top-holders h2 {
-    font-size: 20px;
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: #fff;
-}
-
-.percentage {
-    color: #888;
-    font-size: 15px;
-}
-
-.markets-table, .holders-table {
-    background: #1a1a1a;
-    border-radius: 8px;
-    padding: 16px;
-    overflow-x: auto;
-}
-
-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-}
-
-th {
-    text-align: left;
-    padding: 12px 16px;
-    color: #888;
-    font-weight: 500;
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 1px solid #333;
-}
-
-td {
-    padding: 12px 16px;
-    font-size: 14px;
-    border-bottom: 1px solid #222;
-    color: #fff;
-    font-family: 'Courier New', monospace;
-}
-
-tr:last-child td {
-    border-bottom: none;
-}
-
-tr:hover td {
-    background: #222;
-}
-
-.bundle-info {
-    background: #111111;
-    border: 1px solid #222;
-    border-radius: 12px;
-    padding: 24px;
-}
-
-.bundle-info h2 {
-    font-size: 20px;
-    margin-bottom: 24px;
-    color: #fff;
-}
-
-.bundle-details {
-    background: #1a1a1a;
-    border-radius: 8px;
-    padding: 20px;
+.risk-item.low {
+    background: #001a00;
+    border-left-color: #00ff00;
 }
 
 .bundle-status {
     display: flex;
     align-items: center;
     gap: 16px;
+    background: #1a1a1a;
+    padding: 20px;
+    border-radius: 8px;
 }
 
 .bundle-status .status-icon {
@@ -1468,16 +1317,10 @@ tr:hover td {
     border: 1px solid #ff0000;
 }
 
-.bundle-status .status-text {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
 .bundle-status .status-label {
     font-size: 16px;
     font-weight: 600;
-    letter-spacing: 1px;
+    letter-spacing: 0.05em;
 }
 
 .bundle-status.bundled .status-label {
@@ -1492,23 +1335,154 @@ tr:hover td {
     color: #888;
     font-size: 14px;
     line-height: 1.6;
+    margin-top: 8px;
 }
 
-.bundle-details-text p {
-    margin: 4px 0;
+.token-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+}
+
+.token-detail {
+    background: #1a1a1a;
+    padding: 16px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.token-detail .label {
+    color: #888;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.token-detail .value {
+    color: #fff;
+    font-size: 14px;
+    font-family: 'Roboto Mono', 'Courier New', monospace;
+}
+
+.markets-table, .holders-table {
+    background: #1a1a1a;
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 14px;
+}
+
+th {
+    text-align: left;
+    padding: 12px 16px;
+    color: #888;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #333;
+    font-size: 12px;
+}
+
+td {
+    padding: 12px 16px;
+    color: #fff;
+    border-bottom: 1px solid #222;
+    font-family: 'Roboto Mono', 'Courier New', monospace;
+}
+
+td a {
+    color: #00a2ff;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+td a:hover {
+    color: #33b5ff;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:hover td {
+    background: #222;
+}
+
+.percentage {
+    color: #888;
+    font-size: 14px;
+    font-weight: normal;
+    margin-left: 8px;
+}
+
+small {
+    color: #888;
+    font-size: 12px;
+    margin-top: 4px;
 }
 
 .bundle-error {
     color: #ff8800;
     font-size: 14px;
     text-align: center;
+    padding: 16px;
 }
 
-.risk-reason {
-    font-size: 12px;
-    font-weight: normal;
-    opacity: 0.8;
-    margin-top: 8px;
-    text-transform: none;
-    letter-spacing: normal;
+/* Add loading animation */
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: #888;
+    font-size: 16px;
+    background: #111111;
+    border-radius: 12px;
+    border: 1px solid #222;
+}
+
+.loading::after {
+    content: '';
+    width: 20px;
+    height: 20px;
+    margin-left: 12px;
+    border: 2px solid #333;
+    border-top-color: #00a2ff;
+    border-radius: 50%;
+    animation: loading 0.8s linear infinite;
+}
+
+@keyframes loading {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Error state */
+.analysis-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: #330000;
+    border: 1px solid #ff0000;
+    border-radius: 12px;
+    color: #ff0000;
+}
+
+.analysis-error svg {
+    margin-right: 12px;
+}
+
+.analysis-error p {
+    margin: 0;
+    font-size: 14px;
 }
