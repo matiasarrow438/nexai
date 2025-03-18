@@ -1272,13 +1272,17 @@ footer {
 }
 
 .metric-details {
-    margin-top: 1rem;
-    padding: 0.75rem;
+    margin-top: 1.5rem;
+    padding: 1rem;
     background: rgba(0, 0, 0, 0.2);
     border-radius: 8px;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: rgba(255, 255, 255, 0.9);
-    line-height: 1.5;
+    line-height: 1.6;
+}
+
+.metric-details strong {
+    color: var(--primary-color);
 }
 
 .analysis-error {
@@ -1369,4 +1373,47 @@ footer {
 
 .holder-table tr:hover {
     background: rgba(0, 0, 0, 0.02);
+}
+
+.risk-analysis {
+    text-align: left;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.risk-header {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.risk-warnings {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+}
+
+.risk-item {
+    margin: 0.5rem 0;
+    padding-left: 1rem;
+    position: relative;
+}
+
+.risk-item.high {
+    color: #ff3b30;
+}
+
+.risk-item.medium {
+    color: #ff9500;
+}
+
+.risk-item.low {
+    color: #34c759;
+}
+
+.market-info {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 } 
