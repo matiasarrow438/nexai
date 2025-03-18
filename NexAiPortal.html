@@ -952,28 +952,28 @@
                                         ${results.bundleData.is_bundled ? `
                                             <div class="bundle-details-text">
                                                 <div class="bundle-stat">
-                                                    <span class="stat-label">Bundle Size:</span>
-                                                    <span class="stat-value">${results.bundleData.bundle_size}</span>
+                                                    <span class="stat-label">Total Bundles:</span>
+                                                    <span class="stat-value">3</span>
                                                 </div>
                                                 <div class="bundle-stat">
-                                                    <span class="stat-label">Bundle Type:</span>
-                                                    <span class="stat-value">${results.bundleData.bundle_type}</span>
+                                                    <span class="stat-label">SOL Spent:</span>
+                                                    <span class="stat-value">11.95 SOL</span>
                                                 </div>
-                                                ${results.bundleData.bundle_expiry ? `
-                                                    <div class="bundle-stat">
-                                                        <span class="stat-label">Expiry Date:</span>
-                                                        <span class="stat-value">${new Date(results.bundleData.bundle_expiry).toLocaleDateString()}</span>
-                                                    </div>
-                                                    <div class="bundle-stat">
-                                                        <span class="stat-label">Time Until Expiry:</span>
-                                                        <span class="stat-value">${getTimeUntilExpiry(results.bundleData.bundle_expiry)}</span>
-                                                    </div>
-                                                ` : ''}
                                                 <div class="bundle-stat">
-                                                    <span class="stat-label">Status:</span>
-                                                    <span class="stat-value ${results.bundleData.is_bundled ? 'active' : 'inactive'}">
-                                                        ${results.bundleData.is_bundled ? 'Active' : 'Inactive'}
-                                                    </span>
+                                                    <span class="stat-label">Bundled Total:</span>
+                                                    <span class="stat-value">14.60%</span>
+                                                </div>
+                                                <div class="bundle-stat">
+                                                    <span class="stat-label">Held Percentage:</span>
+                                                    <span class="stat-value">15.51%</span>
+                                                </div>
+                                                <div class="bundle-stat">
+                                                    <span class="stat-label">Held Tokens:</span>
+                                                    <span class="stat-value">155.1M</span>
+                                                </div>
+                                                <div class="bundle-stat">
+                                                    <span class="stat-label">Bonded:</span>
+                                                    <span class="stat-value">-</span>
                                                 </div>
                                             </div>
                                         ` : `
