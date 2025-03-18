@@ -1195,11 +1195,20 @@ footer {
 }
 
 .metric-card {
+    display: flex;
+    flex-direction: column;
     background: rgba(0, 0, 0, 0.2);
     border-radius: 12px;
     padding: 1.5rem;
     text-align: center;
     border: 1px solid rgba(0, 162, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary-color);
+    box-shadow: var(--glow-shadow);
 }
 
 .metric-card h4 {
@@ -1260,4 +1269,51 @@ footer {
     color: var(--text-color);
     padding: 2rem;
     font-size: 1.1rem;
+}
+
+.metric-details {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.5;
+}
+
+.analysis-error {
+    background: rgba(255, 59, 48, 0.1);
+    border: 1px solid rgba(255, 59, 48, 0.2);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    color: #ff3b30;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.analysis-error svg {
+    width: 48px;
+    height: 48px;
+    color: #ff3b30;
+}
+
+.analysis-error p {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.token-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.token-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--primary-color);
 } 
