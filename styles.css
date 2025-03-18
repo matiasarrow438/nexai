@@ -1469,19 +1469,102 @@ tr:hover td {
 }
 
 .bundle-details-text {
-    color: rgba(255, 255, 255, 0.6);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.bundle-stat {
+    background: rgba(0, 162, 255, 0.05);
+    border: 1px solid rgba(0, 162, 255, 0.1);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.bundle-stat .stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.bundle-stat .stat-value {
     font-size: 14px;
-    line-height: 1.6;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.bundle-stat .stat-value.active {
+    color: var(--success-color);
+}
+
+.bundle-stat .stat-value.inactive {
+    color: var(--error-color);
+}
+
+.bundle-status {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px;
+    background: rgba(0, 162, 255, 0.05);
+    border: 1px solid rgba(0, 162, 255, 0.1);
+    border-radius: 12px;
+}
+
+.bundle-status.bundled {
+    background: rgba(0, 255, 148, 0.05);
+    border-color: rgba(0, 255, 148, 0.1);
+}
+
+.bundle-status.not-bundled {
+    background: rgba(255, 59, 48, 0.05);
+    border-color: rgba(255, 59, 48, 0.1);
+}
+
+.status-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.bundle-status.bundled .status-icon {
+    background: rgba(0, 255, 148, 0.1);
+    color: var(--success-color);
+}
+
+.bundle-status.not-bundled .status-icon {
+    background: rgba(255, 59, 48, 0.1);
+    color: var(--error-color);
+}
+
+.status-text {
+    flex: 1;
+}
+
+.status-label {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
 }
 
 .bundle-error {
-    color: #ff8800;
-    font-size: 14px;
+    color: var(--error-color);
+    padding: 16px;
     text-align: center;
-    padding: 20px;
-    background: rgba(255, 136, 0, 0.1);
-    border: 1px solid #ff8800;
-    border-radius: 12px;
+    background: rgba(255, 59, 48, 0.05);
+    border: 1px solid rgba(255, 59, 48, 0.1);
+    border-radius: 8px;
 }
 
 .loading {
