@@ -931,19 +931,81 @@
             const html = `
                 <div class="analysis-card">
                     <div class="token-header">
-                        <h3>${results.tokenName} ${results.tokenSymbol ? `(${results.tokenSymbol})` : ''}</h3>
+                        <div class="token-title">
+                            <h2>${results.tokenName}</h2>
+                            ${results.tokenSymbol ? `<span class="token-symbol">${results.tokenSymbol}</span>` : ''}
+                        </div>
                     </div>
-                    <div class="metrics-grid">
-                        ${results.metrics.map(metric => `
-                            <div class="metric-card ${metric.status}">
-                                <h4>${metric.name}</h4>
-                                <div class="score-circle">
-                                    <span>${metric.score}</span>
-                                </div>
-                                <p class="status-text">${metric.status.charAt(0).toUpperCase() + metric.status.slice(1)}</p>
-                                ${metric.details ? `<div class="metric-details">${metric.details}</div>` : ''}
-                            </div>
-                        `).join('')}
+                    
+                    <div class="analysis-sections">
+                        ${results.metrics.map(metric => {
+                            if (metric.name === "Risk Analysis") {
+                                return `
+                                    <div class="analysis-section risk-section ${metric.status}">
+                                        <div class="section-header">
+                                            <h3>${metric.name}</h3>
+                                            <div class="score-badge ${metric.status}">
+                                                <span class="score-value">${metric.score}</span>
+                                                <span class="score-label">Score</span>
+                                            </div>
+                                        </div>
+                                        <div class="section-content">
+                                            ${metric.details}
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                            else if (metric.name === "Market Analysis") {
+                                return `
+                                    <div class="analysis-section market-section ${metric.status}">
+                                        <div class="section-header">
+                                            <h3>${metric.name}</h3>
+                                            <div class="score-badge ${metric.status}">
+                                                <span class="score-value">${metric.score}</span>
+                                                <span class="score-label">Score</span>
+                                            </div>
+                                        </div>
+                                        <div class="section-content">
+                                            ${metric.details}
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                            else if (metric.name === "Holder Distribution") {
+                                return `
+                                    <div class="analysis-section holders-section ${metric.status}">
+                                        <div class="section-header">
+                                            <h3>${metric.name}</h3>
+                                            <div class="score-badge ${metric.status}">
+                                                <span class="score-value">${metric.score}</span>
+                                                <span class="score-label">Score</span>
+                                            </div>
+                                        </div>
+                                        <div class="section-content">
+                                            ${metric.details}
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                            else if (metric.name === "Contract Info") {
+                                return `
+                                    <div class="analysis-section contract-section ${metric.status}">
+                                        <div class="section-header">
+                                            <h3>${metric.name}</h3>
+                                            <div class="info-badge">
+                                                <svg viewBox="0 0 24 24" width="24" height="24">
+                                                    <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div class="section-content">
+                                            ${metric.details}
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                            return '';
+                        }).join('')}
                     </div>
                 </div>
             `;
