@@ -96,13 +96,15 @@
                 </div>
                 <h1 id="walletTitle">Connect Your Wallet</h1>
                 <p id="walletDescription">Connect your Solana wallet to access the full features of the portal</p>
-                <button class="wallet-connect-btn" id="connectWalletBtn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <path d="M19 7h-1V6a3 3 0 0 0-3-3H5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-8a3 3 0 0 0-3-3zm-3-2v2H5a1 1 0 0 1 0-2h11zm4 12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V8.83A3 3 0 0 0 5 9h14a1 1 0 0 1 1 1v7z" fill="currentColor"/>
-                        <path d="M16 11.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" fill="currentColor"/>
-                    </svg>
-                    <span id="walletButtonText">Connect Wallet</span>
-                </button>
+                <div class="wallet-button-container">
+                    <button class="wallet-connect-btn" id="connectWalletBtn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M19 7h-1V6a3 3 0 0 0-3-3H5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-8a3 3 0 0 0-3-3zm-3-2v2H5a1 1 0 0 1 0-2h11zm4 12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V8.83A3 3 0 0 0 5 9h14a1 1 0 0 1 1 1v7z" fill="currentColor"/>
+                            <path d="M16 11.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" fill="currentColor"/>
+                        </svg>
+                        <span id="walletButtonText">Connect Wallet</span>
+                    </button>
+                </div>
                 <div class="wallet-info" style="display: none;">
                     <p>Connected: <span id="walletAddress"></span></p>
                     <button class="wallet-connect-btn connected" id="disconnectWalletBtn">Disconnect</button>
@@ -167,9 +169,22 @@
         <button class="notification-close" onclick="hideNotification()">✕</button>
     </div>
 
+    <!-- Add this before the closing body tag -->
+    <div class="notification error" id="errorNotification">
+        <svg class="notification-icon" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        </svg>
+        <div class="notification-content">
+            <div class="notification-title">Connection Error</div>
+            <div class="notification-message" id="errorMessage">Failed to connect wallet</div>
+        </div>
+        <button class="notification-close" onclick="hideErrorNotification()">✕</button>
+    </div>
+
     <script>
         let wallet = null;
         let connection = null;
+        let autoReconnectAttempted = false;
 
         // Token lists with IDs and static image URLs
         const majorTokens = [
@@ -195,6 +210,51 @@
         function hideNotification() {
             const notification = document.getElementById('walletNotification');
             notification.classList.remove('show');
+        }
+
+        function showErrorNotification(message) {
+            const notification = document.getElementById('errorNotification');
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => {
+                hideErrorNotification();
+            }, 5000); // Hide after 5 seconds
+        }
+
+        function hideErrorNotification() {
+            const notification = document.getElementById('errorNotification');
+            notification.classList.remove('show');
+        }
+
+        // Add this function to handle auto reconnection
+        async function attemptAutoReconnect() {
+            if (autoReconnectAttempted) return;
+            autoReconnectAttempted = true;
+
+            try {
+                if (window.solana && window.solana.isPhantom) {
+                    wallet = window.solana;
+                    
+                    if (wallet.isConnected) {
+                        await updateWalletUI(true);
+                        return true;
+                    }
+
+                    try {
+                        await wallet.connect({ onlyIfTrusted: true });
+                        return true;
+                    } catch (err) {
+                        console.log('No trusted connection available');
+                        return false;
+                    }
+                }
+            } catch (err) {
+                console.error('Auto reconnect failed:', err);
+                showErrorNotification('Failed to reconnect wallet automatically');
+                return false;
+            }
+            return false;
         }
 
         async function initWallet() {
@@ -234,10 +294,8 @@
                 wallet.on('connect', () => updateWalletUI(true));
                 wallet.on('disconnect', () => updateWalletUI(false));
 
-                // Check if already connected
-                if (wallet.isConnected) {
-                    updateWalletUI(true);
-                }
+                // Attempt auto reconnect
+                await attemptAutoReconnect();
             } catch (err) {
                 console.error('Failed to initialize wallet:', err);
                 showNotification();
@@ -248,13 +306,17 @@
             const connectBtn = document.getElementById('connectWalletBtn');
             const walletInfo = document.querySelector('.wallet-info');
             const walletAddress = document.getElementById('walletAddress');
+            const walletButtonContainer = document.querySelector('.wallet-button-container');
             
             if (isConnected && wallet.publicKey) {
                 // Update UI for connected state
-                connectBtn.style.display = 'none';
+                walletButtonContainer.style.display = 'none';
                 walletInfo.style.display = 'block';
                 const address = wallet.publicKey.toString();
                 walletAddress.textContent = `${address.slice(0, 4)}...${address.slice(-4)}`;
+                
+                // Store connection state
+                localStorage.setItem('walletAutoConnect', 'true');
                 
                 // Load wallet balance
                 loadWalletBalance();
@@ -269,13 +331,15 @@
                 updateTokenAnalytics();
             } else {
                 // Update UI for disconnected state
-                connectBtn.style.display = 'block';
+                walletButtonContainer.style.display = 'block';
                 walletInfo.style.display = 'none';
                 walletAddress.textContent = '';
                 
+                // Clear stored connection state
+                localStorage.removeItem('walletAutoConnect');
+                
                 // Reset balance and analytics
                 document.getElementById('walletBalanceText').textContent = 'Please connect your wallet to view your balance';
-                document.getElementById('analyticsText').textContent = 'Please connect your wallet to view analytics';
                 
                 // Show error message
                 const errorMessage = document.querySelector('.error-message');
@@ -297,22 +361,38 @@
             }
         }
 
-        // Event Listeners
+        // Update the connect button click handler
         document.getElementById('connectWalletBtn').addEventListener('click', async () => {
             try {
-                await wallet.connect();
+                if (!wallet.isConnected) {
+                    await wallet.connect();
+                }
             } catch (err) {
                 console.error('Failed to connect wallet:', err);
-                alert('Failed to connect wallet. Please try again.');
+                const notification = document.getElementById('errorNotification');
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = 'Failed to connect wallet. Please try again.';
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 5000);
             }
         });
 
+        // Update the disconnect button click handler
         document.getElementById('disconnectWalletBtn').addEventListener('click', async () => {
             try {
                 await wallet.disconnect();
+                localStorage.removeItem('walletAutoConnect');
             } catch (err) {
                 console.error('Failed to disconnect wallet:', err);
-                alert('Failed to disconnect wallet. Please try again.');
+                const notification = document.getElementById('errorNotification');
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = 'Failed to disconnect wallet. Please try again.';
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 5000);
             }
         });
 
