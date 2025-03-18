@@ -587,6 +587,14 @@ footer {
 }
 
 /* Wallet Connect Styles */
+.wallet-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
 .wallet-connection {
     max-width: 400px;
     margin: 4rem auto;
@@ -597,6 +605,9 @@ footer {
     border: 1px solid rgba(0, 162, 255, 0.1);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .wallet-connection:hover {
@@ -671,17 +682,24 @@ footer {
 }
 
 .wallet-info {
+    width: 100%;
     margin-top: 2rem;
     padding: 1rem;
     background: rgba(0, 162, 255, 0.05);
     border-radius: 12px;
     border: 1px solid rgba(0, 162, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
 }
 
 .wallet-info p {
-    margin: 0 0 1rem 0;
+    margin: 0;
     color: var(--text-color);
     font-size: 0.9rem;
+    width: 100%;
+    text-align: center;
 }
 
 #walletAddress {
@@ -930,7 +948,71 @@ footer {
     gap: 12px;
     z-index: 1000;
     transform: translateY(200%);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    min-width: 300px;
+    max-width: 400px;
+}
+
+.notification.error {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 16px;
+    background: rgba(31, 41, 55, 0.95);
+    border: 1px solid #ff3b30;
+    border-radius: 8px;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 1000;
+    transform: translateY(200%);
     transition: transform 0.3s ease;
+    min-width: 300px;
+    max-width: 400px;
+    backdrop-filter: blur(8px);
+}
+
+.notification.error .notification-icon {
+    color: #ff3b30;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.notification.error .notification-content {
+    flex: 1;
+}
+
+.notification.error .notification-title {
+    color: #ff3b30;
+    font-weight: 500;
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+}
+
+.notification.error .notification-message {
+    color: #fff;
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.notification.error .notification-close {
+    color: #fff;
+    opacity: 0.6;
+    cursor: pointer;
+    padding: 4px;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease;
+}
+
+.notification.error .notification-close:hover {
+    opacity: 1;
 }
 
 .notification.show {
@@ -941,35 +1023,26 @@ footer {
     width: 24px;
     height: 24px;
     color: var(--primary-color);
+    flex-shrink: 0;
 }
 
 .notification-content {
     flex: 1;
+    min-width: 0;
 }
 
 .notification-title {
     font-weight: 500;
     margin-bottom: 4px;
+    color: var(--text-color);
 }
 
 .notification-message {
     font-size: 0.9rem;
     opacity: 0.8;
-}
-
-.notification-action {
-    background: var(--primary-color);
-    color: #fff;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background 0.3s ease;
-}
-
-.notification-action:hover {
-    background: #0086d1;
+    color: var(--text-color);
+    white-space: normal;
+    word-wrap: break-word;
 }
 
 .notification-close {
@@ -980,6 +1053,10 @@ footer {
     cursor: pointer;
     padding: 4px;
     margin-left: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease;
 }
 
 .notification-close:hover {
