@@ -716,4 +716,112 @@ footer {
     font-size: 1.25rem;
     color: var(--text-color);
     margin-bottom: 0.5rem;
+}
+
+/* Token Analytics Styles */
+.token-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.token-section {
+    background: rgba(0, 162, 255, 0.05);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.token-section h3 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.token-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.token-card {
+    background: rgba(0, 38, 64, 0.5);
+    border: 1px solid rgba(0, 162, 255, 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.token-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary-color);
+    box-shadow: var(--glow-shadow);
+}
+
+.token-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(0, 162, 255, 0.1);
+}
+
+.token-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+}
+
+.token-header h4 {
+    color: var(--text-color);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.token-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.token-stats p {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.token-stats .price {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.token-stats .change {
+    font-weight: 500;
+}
+
+.token-stats .change.positive {
+    color: #00ff9d;
+}
+
+.token-stats .change.negative {
+    color: #ff3b30;
+}
+
+.token-stats .market-cap {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.token-card.loading {
+    animation: pulse 1.5s infinite;
+}
+
+.error-text {
+    color: #ff3b30;
+    text-align: center;
+    padding: 1rem;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
 } 
