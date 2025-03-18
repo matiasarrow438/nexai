@@ -354,10 +354,18 @@
                 const balance = await connection.getBalance(wallet.publicKey);
                 const solBalance = balance / solanaWeb3.LAMPORTS_PER_SOL;
                 document.getElementById('walletBalanceText').textContent = `${solBalance.toFixed(4)} SOL`;
-                document.getElementById('analyticsText').textContent = 'Analytics data loading...';
             } catch (err) {
                 console.error('Failed to load balance:', err);
                 document.getElementById('walletBalanceText').textContent = 'Failed to load balance';
+                
+                // Show error notification
+                const notification = document.getElementById('errorNotification');
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = 'Failed to load wallet balance. Please try again.';
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 5000);
             }
         }
 
