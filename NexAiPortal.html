@@ -937,41 +937,41 @@
                         <div class="bundle-details">
                             ${results.bundleData ? `
                                 <div class="bundle-status ${results.bundleData.is_bundled ? 'bundled' : 'not-bundled'}">
-                                    <div class="status-icon">${results.bundleData.is_bundled ? '✓' : '✗'}</div>
+                                    <div class="status-icon">${results.bundleData.is_bundled ? '✗' : '✓'}</div>
                                     <div class="status-text">
-                                        <span class="status-label">${results.bundleData.is_bundled ? 'BUNDLED' : 'NOT BUNDLED'}</span>
+                                        <span class="status-label">${results.bundleData.is_bundled ? 'BUNDLED (HIGH RISK)' : 'NOT BUNDLED (SAFE)'}</span>
                                         ${results.bundleData.is_bundled ? `
                                             <div class="bundle-details-text">
                                                 <div class="bundle-stat">
                                                     <span class="stat-label">Total Bundles:</span>
-                                                    <span class="stat-value">3</span>
+                                                    <span class="stat-value">${results.bundleData.total_bundles}</span>
                                                 </div>
                                                 <div class="bundle-stat">
                                                     <span class="stat-label">SOL Spent:</span>
-                                                    <span class="stat-value">11.95 SOL</span>
+                                                    <span class="stat-value">${results.bundleData.sol_spent} SOL</span>
                                                 </div>
                                                 <div class="bundle-stat">
                                                     <span class="stat-label">Bundled Total:</span>
-                                                    <span class="stat-value">14.60%</span>
+                                                    <span class="stat-value">${results.bundleData.bundled_total}%</span>
                                                 </div>
                                                 <div class="bundle-stat">
                                                     <span class="stat-label">Held Percentage:</span>
-                                                    <span class="stat-value">15.51%</span>
+                                                    <span class="stat-value">${results.bundleData.held_percentage}%</span>
                                                 </div>
                                                 <div class="bundle-stat">
                                                     <span class="stat-label">Held Tokens:</span>
-                                                    <span class="stat-value">155.1M</span>
+                                                    <span class="stat-value">${results.bundleData.held_tokens}M</span>
                                                 </div>
                                                 <div class="bundle-stat">
                                                     <span class="stat-label">Bonded:</span>
-                                                    <span class="stat-value">-</span>
+                                                    <span class="stat-value">${results.bundleData.bonded || '-'}</span>
                                                 </div>
                                             </div>
                                         ` : `
                                             <div class="bundle-details-text">
                                                 <div class="bundle-stat">
                                                     <span class="stat-label">Status:</span>
-                                                    <span class="stat-value inactive">Not Bundled</span>
+                                                    <span class="stat-value active">Safe - No Bundling Detected</span>
                                                 </div>
                                             </div>
                                         `}
