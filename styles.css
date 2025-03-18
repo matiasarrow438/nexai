@@ -1360,47 +1360,6 @@ footer {
     background: #00a3521a;
 }
 
-.insider-networks {
-    background: #111111;
-    border: 1px solid #222;
-    border-radius: 12px;
-    padding: 24px;
-}
-
-.insider-networks h2 {
-    font-size: 20px;
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: #fff;
-}
-
-.beta-tag {
-    background: #333;
-    color: #fff;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.network-status {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: #00ff00;
-    font-size: 15px;
-    background: #1a1a1a;
-    padding: 16px;
-    border-radius: 8px;
-}
-
-.status-icon {
-    color: #00ff00;
-}
-
 .markets, .top-holders {
     background: #111111;
     border: 1px solid #222;
@@ -1460,4 +1419,4 @@ tr:last-child td {
 
 tr:hover td {
     background: #222;
-} 
+}
