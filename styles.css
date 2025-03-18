@@ -1183,26 +1183,43 @@ footer {
 .analysis-card {
     max-width: 1200px;
     margin: 24px auto;
-    padding: 24px;
-    background: #0a0a0a;
-    border-radius: 12px;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    padding: 32px;
+    background: var(--background-darker);
+    border-radius: 16px;
+    border: 1px solid rgba(0, 162, 255, 0.1);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .risk-overview, .bundle-info, .token-overview, .markets, .top-holders {
-    background: #111111;
-    border: 1px solid #222;
-    border-radius: 12px;
+    background: var(--background-dark);
+    border: 1px solid rgba(0, 162, 255, 0.1);
+    border-radius: 16px;
     padding: 24px;
+    margin-bottom: 24px;
+    transition: all 0.3s ease;
+}
+
+.risk-overview:hover, .bundle-info:hover, .token-overview:hover, .markets:hover, .top-holders:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--glow-shadow);
+    transform: translateY(-2px);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: 24px;
 }
 
-h2 {
-    font-size: 20px;
+.section-header h2 {
+    font-size: 1.5rem;
     font-weight: 600;
-    color: #fff;
-    margin-bottom: 24px;
-    letter-spacing: -0.02em;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin: 0;
 }
 
 .risk-score {
@@ -1213,163 +1230,130 @@ h2 {
 }
 
 .risk-label {
-    padding: 8px 16px;
-    border-radius: 8px;
+    padding: 12px 24px;
+    border-radius: 12px;
     font-weight: 600;
     letter-spacing: 0.05em;
     text-transform: uppercase;
     font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.risk-label:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--glow-shadow);
 }
 
 .risk-label.terrible {
-    background: #330000;
-    color: #ff0000;
-    border: 1px solid #ff0000;
+    background: rgba(255, 0, 0, 0.1);
+    color: #ff3b30;
+    border: 1px solid #ff3b30;
 }
 
 .risk-label.bad {
-    background: #332200;
+    background: rgba(255, 136, 0, 0.1);
     color: #ff8800;
     border: 1px solid #ff8800;
 }
 
 .risk-label.good {
-    background: #003300;
+    background: rgba(0, 255, 0, 0.1);
     color: #00ff00;
     border: 1px solid #00ff00;
 }
 
 .risk-label.really-good {
-    background: #002233;
-    color: #00ffff;
-    border: 1px solid #00ffff;
+    background: rgba(0, 162, 255, 0.1);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
 }
 
 .risk-reason {
     font-size: 12px;
     font-weight: normal;
     opacity: 0.8;
-    margin-top: 8px;
     text-transform: none;
     letter-spacing: normal;
-    color: inherit;
 }
 
 .risk-warnings {
-    background: #1a1a1a;
-    border-radius: 8px;
-    padding: 16px;
+    background: var(--light-bg);
+    border-radius: 12px;
+    padding: 20px;
     font-size: 14px;
     line-height: 1.6;
-    color: #fff;
+    color: var(--text-color);
 }
 
 .risk-item {
-    margin: 8px 0;
-    padding: 12px;
-    border-radius: 6px;
-    border-left: 4px solid;
+    margin: 12px 0;
+    padding: 16px;
+    border-radius: 12px;
+    background: var(--background-darker);
+    border: 1px solid;
+    transition: all 0.3s ease;
+}
+
+.risk-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--glow-shadow);
 }
 
 .risk-item.high {
-    background: #1a0000;
-    border-left-color: #ff0000;
+    border-color: #ff3b30;
 }
 
 .risk-item.medium {
-    background: #1a1100;
-    border-left-color: #ff8800;
+    border-color: #ff8800;
 }
 
 .risk-item.low {
-    background: #001a00;
-    border-left-color: #00ff00;
-}
-
-.bundle-status {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    background: #1a1a1a;
-    padding: 20px;
-    border-radius: 8px;
-}
-
-.bundle-status .status-icon {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    font-size: 18px;
-}
-
-.bundle-status.bundled .status-icon {
-    background: #003300;
-    color: #00ff00;
-    border: 1px solid #00ff00;
-}
-
-.bundle-status.not-bundled .status-icon {
-    background: #330000;
-    color: #ff0000;
-    border: 1px solid #ff0000;
-}
-
-.bundle-status .status-label {
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-}
-
-.bundle-status.bundled .status-label {
-    color: #00ff00;
-}
-
-.bundle-status.not-bundled .status-label {
-    color: #ff0000;
-}
-
-.bundle-details-text {
-    color: #888;
-    font-size: 14px;
-    line-height: 1.6;
-    margin-top: 8px;
+    border-color: #00ff00;
 }
 
 .token-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 16px;
+    gap: 20px;
 }
 
 .token-detail {
-    background: #1a1a1a;
-    padding: 16px;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    background: var(--light-bg);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 162, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.token-detail:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary-color);
+    box-shadow: var(--glow-shadow);
 }
 
 .token-detail .label {
-    color: #888;
+    color: rgba(255, 255, 255, 0.6);
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    margin-bottom: 8px;
 }
 
 .token-detail .value {
-    color: #fff;
-    font-size: 14px;
-    font-family: 'Roboto Mono', 'Courier New', monospace;
+    color: var(--text-color);
+    font-size: 16px;
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 500;
 }
 
 .markets-table, .holders-table {
-    background: #1a1a1a;
-    border-radius: 8px;
-    padding: 16px;
+    background: var(--light-bg);
+    border-radius: 12px;
+    padding: 20px;
     overflow-x: auto;
 }
 
@@ -1382,30 +1366,31 @@ table {
 
 th {
     text-align: left;
-    padding: 12px 16px;
-    color: #888;
+    padding: 16px;
+    color: rgba(255, 255, 255, 0.6);
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid rgba(0, 162, 255, 0.1);
     font-size: 12px;
 }
 
 td {
-    padding: 12px 16px;
-    color: #fff;
-    border-bottom: 1px solid #222;
-    font-family: 'Roboto Mono', 'Courier New', monospace;
+    padding: 16px;
+    color: var(--text-color);
+    border-bottom: 1px solid rgba(0, 162, 255, 0.1);
+    font-family: 'Roboto Mono', monospace;
 }
 
 td a {
-    color: #00a2ff;
+    color: var(--primary-color);
     text-decoration: none;
-    transition: color 0.2s;
+    transition: all 0.3s ease;
 }
 
 td a:hover {
     color: #33b5ff;
+    text-decoration: underline;
 }
 
 tr:last-child td {
@@ -1413,76 +1398,134 @@ tr:last-child td {
 }
 
 tr:hover td {
-    background: #222;
+    background: rgba(0, 162, 255, 0.05);
 }
 
 .percentage {
-    color: #888;
+    color: var(--primary-color);
     font-size: 14px;
-    font-weight: normal;
+    font-weight: 500;
     margin-left: 8px;
 }
 
-small {
-    color: #888;
-    font-size: 12px;
-    margin-top: 4px;
+.bundle-status {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: var(--light-bg);
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 162, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.bundle-status:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary-color);
+    box-shadow: var(--glow-shadow);
+}
+
+.bundle-status .status-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 24px;
+    transition: all 0.3s ease;
+}
+
+.bundle-status.bundled .status-icon {
+    background: rgba(0, 255, 0, 0.1);
+    color: #00ff00;
+    border: 1px solid #00ff00;
+}
+
+.bundle-status.not-bundled .status-icon {
+    background: rgba(255, 59, 48, 0.1);
+    color: #ff3b30;
+    border: 1px solid #ff3b30;
+}
+
+.bundle-status .status-text {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.bundle-status .status-label {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.bundle-status.bundled .status-label {
+    color: #00ff00;
+}
+
+.bundle-status.not-bundled .status-label {
+    color: #ff3b30;
+}
+
+.bundle-details-text {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+    line-height: 1.6;
 }
 
 .bundle-error {
     color: #ff8800;
     font-size: 14px;
     text-align: center;
-    padding: 16px;
+    padding: 20px;
+    background: rgba(255, 136, 0, 0.1);
+    border: 1px solid #ff8800;
+    border-radius: 12px;
 }
 
-/* Add loading animation */
 .loading {
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 40px;
-    color: #888;
+    color: rgba(255, 255, 255, 0.6);
     font-size: 16px;
-    background: #111111;
+    background: var(--light-bg);
     border-radius: 12px;
-    border: 1px solid #222;
+    border: 1px solid rgba(0, 162, 255, 0.1);
 }
 
 .loading::after {
     content: '';
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     margin-left: 12px;
-    border: 2px solid #333;
-    border-top-color: #00a2ff;
+    border: 2px solid rgba(0, 162, 255, 0.2);
+    border-top-color: var(--primary-color);
     border-radius: 50%;
     animation: loading 0.8s linear infinite;
 }
 
-@keyframes loading {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* Error state */
 .analysis-error {
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 24px;
-    background: #330000;
-    border: 1px solid #ff0000;
+    background: rgba(255, 59, 48, 0.1);
+    border: 1px solid #ff3b30;
     border-radius: 12px;
-    color: #ff0000;
+    color: #ff3b30;
 }
 
 .analysis-error svg {
     margin-right: 12px;
+    width: 24px;
+    height: 24px;
 }
 
 .analysis-error p {
     margin: 0;
     font-size: 14px;
+    font-weight: 500;
 }
