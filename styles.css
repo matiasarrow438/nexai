@@ -1111,65 +1111,69 @@ footer {
 /* Token Analysis Styles */
 .token-analysis {
     padding: 2rem;
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
 .token-input-section {
-    background: rgba(0, 162, 255, 0.05);
-    border-radius: 16px;
-    padding: 2rem;
+    background: #111111;
+    border-radius: 12px;
+    padding: 24px;
     margin-bottom: 2rem;
-    border: 1px solid rgba(0, 162, 255, 0.1);
+    border: 1px solid #222;
 }
 
 .token-input-section h2 {
-    margin: 0 0 1rem 0;
-    color: var(--text-color);
+    font-size: 20px;
+    margin-bottom: 16px;
+    color: #fff;
 }
 
 .token-input-section p {
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 1.5rem;
+    color: #888;
+    margin-bottom: 24px;
+    font-size: 15px;
 }
 
 .token-input-container {
     display: flex;
-    gap: 1rem;
+    gap: 16px;
 }
 
 .token-input {
     flex: 1;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(0, 162, 255, 0.2);
+    background: #1a1a1a;
+    border: 1px solid #333;
     border-radius: 8px;
-    padding: 0.75rem 1rem;
-    color: var(--text-color);
-    font-size: 0.95rem;
+    padding: 12px 16px;
+    color: #fff;
+    font-size: 15px;
+    font-family: 'Courier New', monospace;
 }
 
 .token-input:focus {
     outline: none;
-    border-color: var(--primary-color);
+    border-color: #00ffff;
 }
 
 .analyze-btn {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    background: var(--gradient-primary);
-    color: white;
+    gap: 8px;
+    background: #00ffff;
+    color: #000;
     border: none;
-    padding: 0.75rem 1.5rem;
+    padding: 12px 24px;
     border-radius: 8px;
-    font-size: 0.95rem;
+    font-size: 15px;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .analyze-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 162, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 255, 255, 0.2);
 }
 
 .analysis-results {
@@ -1177,19 +1181,21 @@ footer {
 }
 
 .analysis-card {
-    background: #000;
+    background: #0a0a0a;
     border-radius: 12px;
-    padding: 20px;
+    padding: 24px;
     display: grid;
-    gap: 20px;
+    gap: 24px;
     color: #fff;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .risk-overview {
-    background: #000;
-    border: 1px solid #1a1a1a;
-    border-radius: 8px;
-    padding: 20px;
+    background: #111111;
+    border: 1px solid #222;
+    border-radius: 12px;
+    padding: 24px;
 }
 
 .risk-score {
@@ -1200,68 +1206,95 @@ footer {
 }
 
 .risk-score h2 {
-    font-size: 18px;
-    margin-bottom: 10px;
-}
-
-.score-value {
-    font-size: 48px;
-    font-weight: bold;
-    margin: 10px 0;
+    font-size: 20px;
+    margin-bottom: 16px;
+    color: #fff;
 }
 
 .risk-label {
     display: inline-block;
-    padding: 8px 40px;
-    background: #002f0b;
-    color: #00ff29;
-    border: 1px solid #00ff29;
-    border-radius: 4px;
-    font-size: 14px;
+    padding: 12px 48px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
     text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.risk-label.terrible {
+    background: #330000;
+    color: #ff0000;
+    border: 1px solid #ff0000;
+}
+
+.risk-label.bad {
+    background: #332200;
+    color: #ff8800;
+    border: 1px solid #ff8800;
+}
+
+.risk-label.good {
+    background: #003300;
+    color: #00ff00;
+    border: 1px solid #00ff00;
+}
+
+.risk-label.really-good {
+    background: #002233;
+    color: #00ffff;
+    border: 1px solid #00ffff;
 }
 
 .risk-warnings {
-    margin-top: 20px;
-    padding: 10px;
-    background: #ff8c001a;
-    border-radius: 4px;
-    color: #ff8c00;
+    margin-top: 24px;
+    padding: 16px;
+    background: #1a1a1a;
+    border-radius: 8px;
+    color: #ff8800;
+    font-size: 14px;
+    line-height: 1.6;
 }
 
 .token-overview {
-    background: #000;
-    border: 1px solid #1a1a1a;
-    border-radius: 8px;
-    padding: 20px;
+    background: #111111;
+    border: 1px solid #222;
+    border-radius: 12px;
+    padding: 24px;
 }
 
 .token-overview h2 {
-    font-size: 18px;
-    margin-bottom: 20px;
+    font-size: 20px;
+    margin-bottom: 24px;
+    color: #fff;
 }
 
 .token-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
 }
 
 .token-detail {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 8px;
+    background: #1a1a1a;
+    padding: 16px;
+    border-radius: 8px;
 }
 
 .token-detail .label {
-    color: #666;
+    color: #888;
     font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .token-detail .value {
     color: #fff;
-    font-size: 14px;
+    font-size: 15px;
     word-break: break-all;
+    font-family: 'Courier New', monospace;
 }
 
 .custom-domain {
@@ -1328,58 +1361,72 @@ footer {
 }
 
 .insider-networks {
-    background: #000;
-    border: 1px solid #1a1a1a;
-    border-radius: 8px;
-    padding: 20px;
+    background: #111111;
+    border: 1px solid #222;
+    border-radius: 12px;
+    padding: 24px;
 }
 
 .insider-networks h2 {
-    font-size: 18px;
-    margin-bottom: 20px;
+    font-size: 20px;
+    margin-bottom: 24px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    color: #fff;
 }
 
 .beta-tag {
-    background: #666;
+    background: #333;
     color: #fff;
-    padding: 2px 6px;
+    padding: 4px 8px;
     border-radius: 4px;
     font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .network-status {
     display: flex;
     align-items: center;
-    gap: 10px;
-    color: #00ff29;
-    font-size: 14px;
+    gap: 12px;
+    color: #00ff00;
+    font-size: 15px;
+    background: #1a1a1a;
+    padding: 16px;
+    border-radius: 8px;
 }
 
 .status-icon {
-    color: #00ff29;
+    color: #00ff00;
 }
 
 .markets, .top-holders {
-    background: #000;
-    border: 1px solid #1a1a1a;
-    border-radius: 8px;
-    padding: 20px;
+    background: #111111;
+    border: 1px solid #222;
+    border-radius: 12px;
+    padding: 24px;
 }
 
 .markets h2, .top-holders h2 {
-    font-size: 18px;
-    margin-bottom: 20px;
+    font-size: 20px;
+    margin-bottom: 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    color: #fff;
 }
 
 .percentage {
-    color: #666;
-    font-size: 14px;
+    color: #888;
+    font-size: 15px;
+}
+
+.markets-table, .holders-table {
+    background: #1a1a1a;
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
 }
 
 table {
@@ -1390,19 +1437,27 @@ table {
 
 th {
     text-align: left;
-    padding: 10px;
-    color: #666;
-    font-weight: normal;
+    padding: 12px 16px;
+    color: #888;
+    font-weight: 500;
     font-size: 14px;
-    border-bottom: 1px solid #1a1a1a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #333;
 }
 
 td {
-    padding: 10px;
+    padding: 12px 16px;
     font-size: 14px;
-    border-bottom: 1px solid #1a1a1a;
+    border-bottom: 1px solid #222;
+    color: #fff;
+    font-family: 'Courier New', monospace;
 }
 
 tr:last-child td {
     border-bottom: none;
+}
+
+tr:hover td {
+    background: #222;
 } 
