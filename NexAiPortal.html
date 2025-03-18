@@ -773,28 +773,13 @@
 
                 const metrics = [];
 
-                // Basic Token Info
-                const tokenInfo = {
-                    name: rugCheckData.tokenMeta?.name || "Unknown Token",
-                    symbol: rugCheckData.tokenMeta?.symbol || "???",
-                    supply: rugCheckData.token?.supply || 0,
-                    decimals: rugCheckData.token?.decimals || 0
-                };
-
-                // Risk Score Analysis
+                // Risk Analysis
                 metrics.push({
                     name: "Risk Analysis",
                     status: rugCheckData.score_normalised > 70 ? "healthy" : rugCheckData.score_normalised > 40 ? "warning" : "danger",
                     score: rugCheckData.score_normalised,
                     details: `
                         <div class="risk-analysis">
-                            <div class="risk-header">
-                                <strong>Raw Score:</strong> ${rugCheckData.score}<br>
-                                <strong>Normalized Score:</strong> ${rugCheckData.score_normalised}/100<br>
-                                <strong>Status:</strong> ${rugCheckData.rugged ? '⚠️ RUGGED' : '✅ Not Rugged'}<br>
-                                ${rugCheckData.transferFee.pct > 0 ? 
-                                    `<strong>Transfer Fee:</strong> ${rugCheckData.transferFee.pct}%<br>` : ''}
-                            </div>
                             ${rugCheckData.risks.length > 0 ? `
                                 <div class="risk-warnings">
                                     <strong>Risk Warnings:</strong><br>
@@ -897,18 +882,17 @@
                             <strong>Token Program:</strong> ${rugCheckData.token?.tokenProgram || 'N/A'}<br>
                             <strong>Mint Authority:</strong> ${rugCheckData.token?.mintAuthority || 'None'}<br>
                             <strong>Freeze Authority:</strong> ${rugCheckData.token?.freezeAuthority || 'None'}<br>
-                            <strong>Supply:</strong> ${(rugCheckData.token?.supply / Math.pow(10, rugCheckData.token?.decimals)).toLocaleString()} ${tokenInfo.symbol}<br>
+                            <strong>Supply:</strong> ${(rugCheckData.token?.supply / Math.pow(10, rugCheckData.token?.decimals)).toLocaleString()} ${rugCheckData.tokenMeta?.symbol || 'N/A'}<br>
                             <strong>Decimals:</strong> ${rugCheckData.token?.decimals}<br>
                             <strong>Creator:</strong> <a href="https://solscan.io/account/${rugCheckData.creator}" target="_blank">${rugCheckData.creator}</a>
                         </div>
                     `
                 });
 
-                // Display results
+                // Display results with rugcheck data
                 displayAnalysisResults({
-                    tokenName: tokenInfo.name,
-                    tokenSymbol: tokenInfo.symbol,
-                    metrics: metrics
+                    metrics: metrics,
+                    rugCheckData: rugCheckData
                 });
 
             } catch (err) {
@@ -928,16 +912,26 @@
         function displayAnalysisResults(results) {
             const resultsDiv = document.getElementById('analysisResults');
             
-            // Convert numerical score to scale
-            function getScaleFromScore(score) {
-                if (score >= 80) return { text: 'REALLY GOOD', class: 'really-good' };
-                if (score >= 60) return { text: 'GOOD', class: 'good' };
-                if (score >= 40) return { text: 'BAD', class: 'bad' };
+            // Convert rugcheck score to scale
+            function getScaleFromScore(score, rugged, risks) {
+                // If token is marked as rugged, it's terrible
+                if (rugged) return { text: 'TERRIBLE', class: 'terrible' };
+                
+                // Count high severity risks
+                const highRisks = risks.filter(risk => risk.level === 'high').length;
+                
+                // If normalized score is good but there are high risks, downgrade the rating
+                if (highRisks > 2) return { text: 'BAD', class: 'bad' };
+                if (score >= 70) return { text: 'REALLY GOOD', class: 'really-good' };
+                if (score >= 50) return { text: 'GOOD', class: 'good' };
+                if (score >= 30) return { text: 'BAD', class: 'bad' };
                 return { text: 'TERRIBLE', class: 'terrible' };
             }
 
-            const riskScore = results.metrics.find(m => m.name === "Risk Analysis")?.score || 0;
-            const riskScale = getScaleFromScore(riskScore);
+            const riskMetric = results.metrics.find(m => m.name === "Risk Analysis");
+            const riskScore = riskMetric?.score || 0;
+            const rugCheckData = results.rugCheckData; // Assuming this is passed from analyzeToken
+            const riskScale = getScaleFromScore(riskScore, rugCheckData?.rugged, rugCheckData?.risks || []);
             
             const html = `
                 <div class="analysis-card">
@@ -955,41 +949,9 @@
                         <h2>Token Overview</h2>
                         <div class="token-grid">
                             <div class="token-detail">
-                                <span class="label">Mint</span>
-                                <span class="value">${results.metrics.find(m => m.name === "Contract Info")?.details.match(/Mint Authority: ([^\n<]+)/)?.pop() || 'N/A'}</span>
-                            </div>
-                            <div class="token-detail">
-                                <span class="label">Supply</span>
-                                <span class="value">${results.metrics.find(m => m.name === "Contract Info")?.details.match(/Supply: ([^\n<]+)/)?.pop() || 'N/A'}</span>
-                            </div>
-                            <div class="token-detail">
-                                <span class="label">Creator</span>
-                                <span class="value">${results.metrics.find(m => m.name === "Contract Info")?.details.match(/Creator: ([^\n<]+)/)?.pop() || 'N/A'}</span>
-                            </div>
-                            <div class="token-detail">
-                                <span class="label">Market Cap</span>
-                                <span class="value">${results.metrics.find(m => m.name === "Market Analysis")?.details.match(/Total Liquidity: ([^\n<]+)/)?.pop() || 'N/A'}</span>
-                            </div>
-                            <div class="token-detail">
-                                <span class="label">Holders</span>
-                                <span class="value">${results.metrics.find(m => m.name === "Holder Distribution")?.details.match(/Total Holders: ([^\n<]+)/)?.pop() || 'N/A'}</span>
-                            </div>
-                            <div class="token-detail">
-                                <span class="label">Mint Authority</span>
-                                <span class="value">${results.metrics.find(m => m.name === "Contract Info")?.details.match(/Mint Authority: ([^\n<]+)/)?.pop() || '-'}</span>
-                            </div>
-                            <div class="token-detail">
                                 <span class="label">LP Locked</span>
                                 <span class="value">${results.metrics.find(m => m.name === "Market Analysis")?.details.match(/Locked %: ([^\n<]+)/)?.pop() || '100.00%'}</span>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="insider-networks">
-                        <h2>Insider Networks <span class="beta-tag">BETA</span></h2>
-                        <div class="network-status">
-                            <span class="status-icon">✓</span>
-                            NO INSIDER NETWORKS DETECTED
                         </div>
                     </div>
 
