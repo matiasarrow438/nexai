@@ -587,40 +587,107 @@ footer {
 }
 
 /* Wallet Connect Styles */
-.wallet-connect-container {
-    max-width: 500px;
+.wallet-connection {
+    max-width: 400px;
     margin: 4rem auto;
     text-align: center;
     padding: 3rem;
     background: rgba(0, 162, 255, 0.05);
-    border-radius: 16px;
+    border-radius: 24px;
     border: 1px solid rgba(0, 162, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.wallet-connection:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 48px rgba(0, 162, 255, 0.1);
+    border-color: rgba(0, 162, 255, 0.2);
 }
 
 .wallet-icon {
-    width: 80px;
-    height: 80px;
+    width: 64px;
+    height: 64px;
     margin: 0 auto 2rem;
     background: rgba(0, 162, 255, 0.1);
-    border-radius: 50%;
+    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--primary-color);
+    transition: all 0.3s ease;
 }
 
-.wallet-connect-container h1 {
-    font-size: 2rem;
+.wallet-connection:hover .wallet-icon {
+    transform: scale(1.05);
+    background: rgba(0, 162, 255, 0.15);
+}
+
+.wallet-connection h1 {
+    font-size: 1.75rem;
     color: var(--text-color);
     margin-bottom: 1rem;
+    font-weight: 600;
 }
 
-.wallet-connect-container p {
+.wallet-connection p {
     color: rgba(255, 255, 255, 0.7);
     margin-bottom: 2rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
 }
 
 .wallet-connect-btn {
+    background: var(--gradient-primary);
+    color: var(--white);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 500;
     min-width: 200px;
+    justify-content: center;
+}
+
+.wallet-connect-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 162, 255, 0.2);
+}
+
+.wallet-connect-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.wallet-connect-btn.connected {
+    background: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.wallet-info {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: rgba(0, 162, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 162, 255, 0.1);
+}
+
+.wallet-info p {
+    margin: 0 0 1rem 0;
+    color: var(--text-color);
+    font-size: 0.9rem;
+}
+
+#walletAddress {
+    color: var(--primary-color);
+    font-family: monospace;
+    font-weight: 500;
 }
 
 /* Tab Content Styles */
@@ -684,12 +751,6 @@ footer {
 }
 
 /* Wallet Connection Styles */
-.wallet-connect-btn.connected {
-    background: rgba(0, 162, 255, 0.1);
-    border: 1px solid var(--primary-color);
-    color: var(--primary-color);
-}
-
 .wallet-balance {
     margin-top: 2rem;
     padding: 1.5rem;
@@ -750,6 +811,9 @@ footer {
     border-radius: 12px;
     padding: 1.25rem;
     transition: all 0.3s ease;
+    min-height: 160px;
+    display: flex;
+    flex-direction: column;
 }
 
 .token-card:hover {
@@ -761,55 +825,34 @@ footer {
 .token-header {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid rgba(0, 162, 255, 0.1);
+    gap: 12px;
+    margin-bottom: 1.25rem;
 }
 
 .token-icon {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
+    background: rgba(0, 162, 255, 0.1);
 }
 
 .token-header h4 {
-    color: var(--text-color);
-    font-size: 1rem;
+    margin: 0;
+    font-size: 1.1rem;
     font-weight: 500;
 }
 
 .token-stats {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 12px;
+    margin-top: auto;
 }
 
 .token-stats p {
-    margin: 0.5rem 0;
+    margin: 0;
     line-height: 1.4;
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.token-stats .price {
-    color: var(--text-color);
-    font-weight: 500;
-}
-
-.token-stats .change {
-    font-weight: 500;
-}
-
-.token-stats .change.positive {
-    color: #00ff9d;
-}
-
-.token-stats .change.negative {
-    color: #ff3b30;
-}
-
-.token-stats .market-cap {
-    color: rgba(255, 255, 255, 0.6);
+    font-size: 1rem;
 }
 
 .token-card.loading {
@@ -849,4 +892,96 @@ footer {
     height: 24px;
     border-radius: 50%;
     background: rgba(0, 162, 255, 0.1);
+}
+
+/* Price update animations */
+@keyframes priceUp {
+    0% { color: var(--text-color); }
+    50% { color: #00ff9d; }
+    100% { color: var(--text-color); }
+}
+
+@keyframes priceDown {
+    0% { color: var(--text-color); }
+    50% { color: #ff3b30; }
+    100% { color: var(--text-color); }
+}
+
+.price-up {
+    animation: priceUp 1s ease;
+}
+
+.price-down {
+    animation: priceDown 1s ease;
+}
+
+.notification {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 16px 24px;
+    background: rgba(0, 38, 64, 0.95);
+    border: 1px solid var(--primary-color);
+    border-radius: 12px;
+    color: var(--text-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 1000;
+    transform: translateY(200%);
+    transition: transform 0.3s ease;
+}
+
+.notification.show {
+    transform: translateY(0);
+}
+
+.notification-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--primary-color);
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-title {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.notification-message {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.notification-action {
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.3s ease;
+}
+
+.notification-action:hover {
+    background: #0086d1;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    opacity: 0.6;
+    cursor: pointer;
+    padding: 4px;
+    margin-left: 8px;
+}
+
+.notification-close:hover {
+    opacity: 1;
 } 
