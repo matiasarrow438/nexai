@@ -739,15 +739,16 @@ footer {
 
 .token-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    padding: 0.5rem;
 }
 
 .token-card {
     background: rgba(0, 38, 64, 0.5);
     border: 1px solid rgba(0, 162, 255, 0.1);
-    border-radius: 8px;
-    padding: 1rem;
+    border-radius: 12px;
+    padding: 1.25rem;
     transition: all 0.3s ease;
 }
 
@@ -785,7 +786,8 @@ footer {
 }
 
 .token-stats p {
-    font-size: 0.875rem;
+    margin: 0.5rem 0;
+    line-height: 1.4;
     color: rgba(255, 255, 255, 0.8);
 }
 
@@ -824,4 +826,27 @@ footer {
     0% { opacity: 1; }
     50% { opacity: 0.5; }
     100% { opacity: 1; }
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    margin: 2rem auto;
+    border: 3px solid rgba(0, 162, 255, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.token-icon-placeholder {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(0, 162, 255, 0.1);
 } 
