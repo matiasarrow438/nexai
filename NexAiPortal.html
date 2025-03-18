@@ -747,19 +747,68 @@
                 }
 
                 const metrics = [];
+                const tokenName = solscanData?.metadata?.name || dexScreenerData?.name || "Unknown Token";
+                const tokenSymbol = solscanData?.metadata?.symbol || dexScreenerData?.symbol;
+
+                // Check if token name ends with "pump" for liquidity lock status
+                const isPumpToken = tokenName.toLowerCase().endsWith('pump');
 
                 // Liquidity Analysis
                 if (dexScreenerData?.liquidity) {
                     const liquidity = dexScreenerData.liquidity;
+                    // Override isLocked if it's a pump token
+                    if (isPumpToken) {
+                        liquidity.isLocked = true;
+                        liquidity.lockedPercentage = 100;
+                    }
+                    
                     metrics.push({
                         name: "Liquidity",
                         status: liquidity.usd > 100000 ? "healthy" : liquidity.usd > 50000 ? "warning" : "danger",
                         score: Math.min(100, Math.round((liquidity.usd / 100000) * 100)),
                         details: `
                             Amount: $${liquidity.usd.toLocaleString()}<br>
-                            Status: ${liquidity.isLocked ? '🔒 Locked' : '🔓 Unlocked'}<br>
-                            ${liquidity.isLocked ? `Locked Amount: ${liquidity.lockedAmount}<br>
-                            Locked Percentage: ${liquidity.lockedPercentage}%` : ''}
+                            Status: ${liquidity.isLocked ? '🔒 Locked' : '🔓 Unlocked'}${isPumpToken ? ' (Pump Token)' : ''}<br>
+                            ${liquidity.isLocked ? `Locked Amount: $${liquidity.usd.toLocaleString()}<br>
+                            Locked Percentage: ${isPumpToken ? '100' : liquidity.lockedPercentage}%` : ''}
+                        `
+                    });
+                }
+
+                // Top 10 Holders (Separate from general holder distribution)
+                if (solscanData?.holders) {
+                    const holders = solscanData.holders;
+                    metrics.push({
+                        name: "Top 10 Holders",
+                        status: holders.top10Percentage < 50 ? "healthy" : holders.top10Percentage < 70 ? "warning" : "danger",
+                        score: Math.max(0, 100 - Math.round(holders.top10Percentage)),
+                        details: `
+                            <div class="holder-list">
+                                <div class="holder-header">
+                                    <strong>Total Holders:</strong> ${holders.total.toLocaleString()}<br>
+                                    <strong>Combined Top 10:</strong> ${holders.top10Percentage.toFixed(2)}%
+                                </div>
+                                <div class="holder-table">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Rank</th>
+                                                <th>Address</th>
+                                                <th>Percentage</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${holders.top10.map((holder, i) => `
+                                                <tr>
+                                                    <td>#${i + 1}</td>
+                                                    <td><a href="https://solscan.io/account/${holder.address}" target="_blank">${holder.address.substring(0, 6)}...${holder.address.substring(holder.address.length - 4)}</a></td>
+                                                    <td>${holder.percentage.toFixed(2)}%</td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         `
                     });
                 }
@@ -777,26 +826,6 @@
                             1H: ${formatVolumeData(volume.h1)}<br>
                             6H: ${formatVolumeData(volume.h6)}<br>
                             24H: ${formatVolumeData(volume.h24)}
-                        `
-                    });
-                }
-
-                // Holder Analysis
-                if (solscanData?.holders) {
-                    const holders = solscanData.holders;
-                    const holderScore = Math.max(0, 100 - Math.round(holders.top10Percentage));
-                    
-                    metrics.push({
-                        name: "Holder Distribution",
-                        status: holderScore > 70 ? "healthy" : holderScore > 40 ? "warning" : "danger",
-                        score: holderScore,
-                        details: `
-                            Total Holders: ${holders.total.toLocaleString()}<br>
-                            Top 10 Hold: ${holders.top10Percentage.toFixed(2)}%<br>
-                            Distribution:<br>
-                            ${holders.top10.map((holder, i) => 
-                                `#${i + 1}: ${holder.percentage.toFixed(2)}%`
-                            ).join('<br>')}
                         `
                     });
                 }
@@ -820,8 +849,8 @@
 
                 // Display results
                 displayAnalysisResults({
-                    tokenName: solscanData?.metadata?.name || dexScreenerData?.name || "Unknown Token",
-                    tokenSymbol: solscanData?.metadata?.symbol || dexScreenerData?.symbol,
+                    tokenName: tokenName,
+                    tokenSymbol: tokenSymbol,
                     metrics: metrics
                 });
 
