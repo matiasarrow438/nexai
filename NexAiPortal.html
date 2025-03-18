@@ -131,14 +131,6 @@
                     </div>
                 </div>
 
-                <!-- Add this new section -->
-                <div class="major-cryptos-section">
-                    <h2>Major Cryptocurrencies</h2>
-                    <div id="crypto-list" class="crypto-list">
-                        <!-- Crypto items will be dynamically inserted here -->
-                    </div>
-                </div>
-
                 <div id="analysisResults" class="analysis-results"></div>
             </div>
         </div>
@@ -159,18 +151,8 @@
                     <!-- Major Cryptocurrencies -->
                     <div class="token-section">
                         <h3>Major Cryptocurrencies</h3>
-                        <div class="token-grid" id="majorTokens">
-                            <div class="token-card loading">
-                                <div class="token-header">
-                                    <div class="token-icon-placeholder"></div>
-                                    <h4>Loading...</h4>
-                                </div>
-                                <div class="token-stats">
-                                    <p class="price">Price: Loading...</p>
-                                    <p class="change">24h: Loading...</p>
-                                    <p class="market-cap">Market Cap: Loading...</p>
-                                </div>
-                            </div>
+                        <div id="crypto-list" class="crypto-list">
+                            <!-- Crypto items will be dynamically inserted here -->
                         </div>
                     </div>
                 </div>
@@ -466,7 +448,31 @@
                     content.classList.remove('active');
                 });
                 document.getElementById(tabId).classList.add('active');
+
+                // Load crypto data when analytics tab is active
+                if (tabId === 'analytics') {
+                    fetchMajorCryptos();
+                }
             });
+        });
+
+        // Update the initialization to only load crypto data when needed
+        document.addEventListener('DOMContentLoaded', function() {
+            // ... existing code ...
+            
+            // Only fetch crypto data if analytics tab is active
+            const analyticsTab = document.querySelector('[data-tab="analytics"]');
+            if (analyticsTab && analyticsTab.classList.contains('active')) {
+                fetchMajorCryptos();
+            }
+            
+            // Refresh crypto data every 5 minutes only if analytics tab is active
+            setInterval(() => {
+                const analyticsTab = document.querySelector('[data-tab="analytics"]');
+                if (analyticsTab && analyticsTab.classList.contains('active')) {
+                    fetchMajorCryptos();
+                }
+            }, 300000);
         });
 
         async function fetchTokenData() {
@@ -597,8 +603,8 @@
                 isUpdating = true;
                 
                 // Create cards if they don't exist
-                const majorTokensContainer = document.getElementById('majorTokens');
-                if (!majorTokensContainer.querySelector('.token-card')) {
+                const majorTokensContainer = document.getElementById('crypto-list');
+                if (!majorTokensContainer.querySelector('.crypto-item')) {
                     majorTokensContainer.innerHTML = majorTokens.map(token => createTokenCard(token)).join('');
                 }
 
@@ -1123,17 +1129,6 @@
                 }
             }
         }
-
-        // Update the initialization to include error handling
-        document.addEventListener('DOMContentLoaded', function() {
-            // ... existing code ...
-            
-            // Fetch crypto data when the page loads
-            fetchMajorCryptos();
-            
-            // Refresh crypto data every 5 minutes
-            setInterval(fetchMajorCryptos, 300000);
-        });
     </script>
 </body>
 </html>
