@@ -1420,3 +1420,95 @@ tr:last-child td {
 tr:hover td {
     background: #222;
 }
+
+.bundle-info {
+    background: #111111;
+    border: 1px solid #222;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.bundle-info h2 {
+    font-size: 20px;
+    margin-bottom: 24px;
+    color: #fff;
+}
+
+.bundle-details {
+    background: #1a1a1a;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.bundle-status {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.bundle-status .status-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 18px;
+}
+
+.bundle-status.bundled .status-icon {
+    background: #003300;
+    color: #00ff00;
+    border: 1px solid #00ff00;
+}
+
+.bundle-status.not-bundled .status-icon {
+    background: #330000;
+    color: #ff0000;
+    border: 1px solid #ff0000;
+}
+
+.bundle-status .status-text {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.bundle-status .status-label {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.bundle-status.bundled .status-label {
+    color: #00ff00;
+}
+
+.bundle-status.not-bundled .status-label {
+    color: #ff0000;
+}
+
+.bundle-details-text {
+    color: #888;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.bundle-details-text p {
+    margin: 4px 0;
+}
+
+.bundle-error {
+    color: #ff8800;
+    font-size: 14px;
+    text-align: center;
+}
+
+.risk-reason {
+    font-size: 12px;
+    font-weight: normal;
+    opacity: 0.8;
+    margin-top: 8px;
+    text-transform: none;
+    letter-spacing: normal;
+}
