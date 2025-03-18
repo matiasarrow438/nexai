@@ -928,13 +928,23 @@
         function displayAnalysisResults(results) {
             const resultsDiv = document.getElementById('analysisResults');
             
+            // Convert numerical score to scale
+            function getScaleFromScore(score) {
+                if (score >= 80) return { text: 'REALLY GOOD', class: 'really-good' };
+                if (score >= 60) return { text: 'GOOD', class: 'good' };
+                if (score >= 40) return { text: 'BAD', class: 'bad' };
+                return { text: 'TERRIBLE', class: 'terrible' };
+            }
+
+            const riskScore = results.metrics.find(m => m.name === "Risk Analysis")?.score || 0;
+            const riskScale = getScaleFromScore(riskScore);
+            
             const html = `
                 <div class="analysis-card">
                     <div class="risk-overview">
                         <div class="risk-score">
                             <h2>Risk Analysis</h2>
-                            <div class="score-value">${results.metrics.find(m => m.name === "Risk Analysis")?.score || 0}</div>
-                            <div class="risk-label">Good</div>
+                            <div class="risk-label ${riskScale.class}">${riskScale.text}</div>
                         </div>
                         <div class="risk-warnings">
                             ${results.metrics.find(m => m.name === "Risk Analysis")?.details || ''}
@@ -971,24 +981,6 @@
                             <div class="token-detail">
                                 <span class="label">LP Locked</span>
                                 <span class="value">${results.metrics.find(m => m.name === "Market Analysis")?.details.match(/Locked %: ([^\n<]+)/)?.pop() || '100.00%'}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="custom-domain">
-                        <h2>Custom Domain</h2>
-                        <p>Claim a custom domain for this token for users to use across the ecosystem.</p>
-                        <button class="claim-btn">CLAIM</button>
-                    </div>
-
-                    <div class="community-sentiment">
-                        <h2>Community Sentiment</h2>
-                        <div class="sentiment-indicators">
-                            <div class="sentiment negative">
-                                <span class="icon">👀</span>
-                            </div>
-                            <div class="sentiment positive">
-                                <span class="icon">🚀</span>
                             </div>
                         </div>
                     </div>
