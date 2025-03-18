@@ -127,7 +127,7 @@
                     <p>Enter a token address to analyze its performance and risk metrics</p>
                     <div class="input-group">
                         <input type="text" id="tokenAddress" placeholder="Enter token address" class="token-input">
-                        <button onclick="analyzeToken()" class="analyze-btn">Analyze</button>
+                        <button id="analyzeTokenBtn" class="analyze-btn">Analyze</button>
                     </div>
                 </div>
 
@@ -806,7 +806,13 @@
         }
 
         // Update the analyzeToken function
-        async function analyzeToken(address) {
+        async function analyzeToken() {
+            const address = document.getElementById('tokenAddress').value.trim();
+            if (!address) {
+                showErrorNotification('Please enter a valid token address');
+                return;
+            }
+
             try {
                 const resultsDiv = document.getElementById('analysisResults');
                 resultsDiv.innerHTML = '<div class="loading">Analyzing token...</div>';
@@ -853,6 +859,7 @@
 
             } catch (err) {
                 console.error('Failed to analyze token:', err);
+                const resultsDiv = document.getElementById('analysisResults');
                 resultsDiv.innerHTML = `
                     <div class="analysis-error">
                         <svg viewBox="0 0 24 24" width="24" height="24">
@@ -863,6 +870,14 @@
                 `;
             }
         }
+
+        // Add event listener for token analysis
+        document.addEventListener('DOMContentLoaded', function() {
+            const analyzeBtn = document.getElementById('analyzeTokenBtn');
+            if (analyzeBtn) {
+                analyzeBtn.addEventListener('click', analyzeToken);
+            }
+        });
 
         // Update the displayAnalysisResults function
         function displayAnalysisResults(results) {
@@ -1053,16 +1068,6 @@
             
             resultsDiv.innerHTML = html;
         }
-
-        // Add event listener for token analysis
-        document.getElementById('analyzeTokenBtn').addEventListener('click', () => {
-            const address = document.getElementById('tokenAddress').value.trim();
-            if (address) {
-                analyzeToken(address);
-            } else {
-                showErrorNotification('Please enter a valid token address');
-            }
-        });
 
         // Add this at the beginning of your script section
         async function fetchMajorCryptos() {
