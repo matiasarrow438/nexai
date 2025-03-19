@@ -58,15 +58,21 @@
         <nav class="sidebar-nav">
             <a href="#dashboard" class="nav-item active" data-tab="dashboard">
                 <svg viewBox="0 0 24 24" width="20" height="20">
-                    <path fill="currentColor" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                    <path fill="currentColor" d="M12 2L1 12h3v9h6v-6h4v6h6v-9h3L12 2zm0 2.84L19.93 12H18v7h-4v-6H10v6H6v-7H4.07L12 4.84z"/>
                 </svg>
-                <span class="nav-item-text">Dashboard</span>
+                <span class="nav-item-text">RiskCheck</span>
             </a>
             <a href="#analytics" class="nav-item" data-tab="analytics">
                 <svg viewBox="0 0 24 24" width="20" height="20">
-                    <path fill="currentColor" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                    <path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z"/>
                 </svg>
                 <span class="nav-item-text">Analytics</span>
+            </a>
+            <a href="#wallet-checker" class="nav-item" data-tab="wallet-checker">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor" d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+                </svg>
+                <span class="nav-item-text">Wallet Checker</span>
             </a>
         </nav>
     </aside>
@@ -76,13 +82,13 @@
         <!-- Dashboard Tab -->
         <div class="tab-content active" id="dashboard">
             <!-- Token Analysis Section -->
-            <div class="token-analysis" id="tokenAnalysisSection">
+            <div class="token-analysis">
                 <div class="token-input-section">
                     <h2>Token Analysis</h2>
                     <p>Enter a token address to analyze its performance and risk metrics</p>
                     <div class="input-group">
                         <input type="text" id="tokenAddress" placeholder="Enter token address" class="token-input">
-                        <button id="analyzeTokenBtn" class="analyze-btn">Analyze</button>
+                        <button onclick="analyzeToken()" class="analyze-btn">Analyze</button>
                     </div>
                 </div>
 
@@ -105,7 +111,478 @@
                 </div>
             </div>
         </div>
+
+        <!-- Wallet Checker Tab -->
+        <div class="tab-content" id="wallet-checker">
+            <div class="wallet-checker">
+                <div class="token-input-section">
+                    <h2>Wallet Checker</h2>
+                    <p>Enter a wallet address to analyze its holdings and transaction history</p>
+                    <div class="input-group">
+                        <input type="text" id="walletAddress" placeholder="Enter wallet address" class="token-input">
+                        <button onclick="checkWallet()" class="analyze-btn">Check Wallet</button>
+                    </div>
+                </div>
+                <div id="walletResults" class="analysis-results"></div>
+            </div>
+        </div>
     </main>
+
+    <style>
+        .analysis-card {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 600px;
+        }
+
+        .risk-overview {
+            grid-column: 1 / -1;
+            background: rgba(26, 27, 35, 0.9);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .bundle-info {
+            background: rgba(26, 27, 35, 0.9);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            grid-column: 1 / -1;
+        }
+
+        .bundle-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bundle-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            font-weight: bold;
+            font-size: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .bundle-icon.high-risk {
+            background: linear-gradient(135deg, #ff4444 0%, #ff6b6b 100%);
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 68, 68, 0.3);
+        }
+
+        .bundle-icon.safe {
+            background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+            color: white;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .bundle-title {
+            font-size: 24px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .bundle-title.high-risk {
+            color: #ff4444;
+            text-shadow: 0 0 10px rgba(255, 68, 68, 0.3);
+        }
+
+        .bundle-title.safe {
+            color: #4CAF50;
+            text-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .bundle-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 24px;
+        }
+
+        .bundle-stat {
+            background: rgba(36, 37, 47, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .bundle-stat:hover {
+            background: rgba(36, 37, 47, 0.95);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-label {
+            color: #8a8d98;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value.highlight {
+            color: #00a2ff;
+            text-shadow: 0 0 10px rgba(0, 162, 255, 0.3);
+        }
+
+        .stat-value.high-risk {
+            color: #ff4444;
+            text-shadow: 0 0 10px rgba(255, 68, 68, 0.3);
+        }
+
+        .stat-value.safe {
+            color: #4CAF50;
+            text-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .section-header {
+            margin-bottom: 24px;
+        }
+
+        .section-header h2 {
+            color: #fff;
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-header h2::after {
+            content: '';
+            height: 2px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+            flex: 1;
+            margin-left: 16px;
+        }
+
+        .token-overview, .markets, .top-holders {
+            background: rgba(26, 27, 35, 0.9);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .token-overview {
+            grid-column: 1 / 2;
+        }
+
+        .markets {
+            grid-column: 2 / -1;
+        }
+
+        .top-holders {
+            grid-column: 1 / -1;
+        }
+
+        .bundle-error {
+            color: #ff4444;
+            
+            text-align: center;
+            padding: 20px;
+            font-size: 16px;
+            background: rgba(255, 68, 68, 0.1);
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .bundle-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .analysis-card {
+                grid-template-columns: 1fr;
+            }
+
+            .bundle-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .token-overview, .markets {
+                grid-column: 1 / -1;
+            }
+        }
+
+        /* Add these new styles for the token analysis input section */
+        .token-analysis {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .token-input-section {
+            background: rgba(26, 27, 35, 0.9);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .token-input-section h2 {
+            color: #fff;
+            font-size: 28px;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+            letter-spacing: 0.5px;
+        }
+
+        .token-input-section p {
+            color: #8a8d98;
+            font-size: 16px;
+            margin: 0 0 24px 0;
+            line-height: 1.5;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .token-input {
+            flex: 1;
+            background: rgba(36, 37, 47, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 16px;
+            color: #fff;
+        }
+
+        .token-input:focus {
+            outline: none;
+            border-color: #00a2ff;
+            box-shadow: 0 0 0 2px rgba(0, 162, 255, 0.2);
+            background: rgba(36, 37, 47, 0.95);
+        }
+
+        .token-input::placeholder {
+            color: #8a8d98;
+        }
+
+        .analyze-btn {
+            background: linear-gradient(135deg, #00a2ff 0%, #0077ff 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            min-width: 120px;
+            position: relative;
+        }
+
+        .analyze-btn:hover {
+            background: linear-gradient(135deg, #0077ff 0%, #00a2ff 100%);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            color: transparent;
+        }
+
+        .analyze-btn:disabled::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin-left: -8px;
+            margin-top: -8px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: button-loading-spinner 1s linear infinite;
+        }
+
+        @keyframes button-loading-spinner {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .bundle-stat {
+            background: rgba(36, 37, 47, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .bundle-stat:hover {
+            background: rgba(36, 37, 47, 0.95);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .token-input {
+            flex: 1;
+            background: rgba(36, 37, 47, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 16px;
+            color: #fff;
+        }
+
+        .token-input:focus {
+            outline: none;
+            border-color: #00a2ff;
+            box-shadow: 0 0 0 2px rgba(0, 162, 255, 0.2);
+            background: rgba(36, 37, 47, 0.95);
+        }
+
+        .token-input::placeholder {
+            color: #8a8d98;
+        }
+
+        .sidebar-toggle {
+            background: rgba(36, 37, 47, 0.8);
+            border: none;
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #8a8d98;
+        }
+
+        .sidebar-toggle:hover {
+            background: rgba(36, 37, 47, 0.95);
+            color: #fff;
+        }
+
+        .sidebar-collapsed .sidebar {
+            width: 72px;
+        }
+
+        .sidebar-collapsed .sidebar-toggle {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .sidebar-collapsed .logo {
+            margin: 0 auto;
+        }
+
+        .sidebar-collapsed .nav-item-text {
+            display: none;
+        }
+
+        .sidebar-collapsed .sidebar-header {
+            padding: 16px 12px;
+            justify-content: center;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+        }
+
+        .logo-link {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Update the toggle icon to look better */
+        .sidebar-toggle svg {
+            width: 18px;
+            height: 18px;
+            transition: transform 0.2s ease;
+        }
+
+        .sidebar-collapsed .sidebar-toggle svg {
+            transform: rotate(180deg);
+        }
+
+        /* Add a subtle glow effect to match the theme */
+        .sidebar-toggle:hover {
+            box-shadow: 0 0 10px rgba(0, 162, 255, 0.1);
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 20px;
+            color: #8a8d98;
+        }
+
+        .analysis-error {
+            background: rgba(255, 68, 68, 0.1);
+            border-radius: 12px;
+            padding: 24px;
+            color: #ff4444;
+            margin-top: 20px;
+        }
+
+        .analysis-error p {
+            margin: 0 0 12px 0;
+        }
+
+        .analysis-error .error-details {
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px;
+            border-radius: 4px;
+            margin: 12px 0;
+        }
+
+        .analysis-error .error-help {
+            color: #8a8d98;
+            margin-top: 16px;
+        }
+
+        .analysis-error ul {
+            color: #8a8d98;
+            margin: 8px 0;
+            padding-left: 24px;
+        }
+    </style>
 
     <script>
         // Token lists with IDs and static image URLs
@@ -120,6 +597,44 @@
 
         // Cache for token data
         let tokenDataCache = {};
+        let analysisCache = {};
+        const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+        const API_TIMEOUT = 10000; // 10 seconds timeout
+
+        // Helper function to check if data is cached and not expired
+        function getCachedData(key) {
+            const cached = analysisCache[key];
+            if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+                return cached.data;
+            }
+            return null;
+        }
+
+        // Helper function to cache data
+        function cacheData(key, data) {
+            analysisCache[key] = {
+                data: data,
+                timestamp: Date.now()
+            };
+        }
+
+        // Helper function for API calls with timeout
+        async function fetchWithTimeout(url, options = {}) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                return response;
+            } catch (error) {
+                clearTimeout(timeoutId);
+                throw error;
+            }
+        }
 
         // Sidebar toggle functionality
         document.querySelector('.sidebar-toggle').addEventListener('click', () => {
@@ -151,7 +666,7 @@
             });
         });
 
-        // Initialize crypto data if analytics tab is active
+        // Initialize crypto data when analytics tab is active
         document.addEventListener('DOMContentLoaded', function() {
             const analyticsTab = document.querySelector('[data-tab="analytics"]');
             if (analyticsTab && analyticsTab.classList.contains('active')) {
@@ -167,15 +682,583 @@
             }, 300000);
         });
 
-        // Add event listener for token analysis
-        document.addEventListener('DOMContentLoaded', function() {
-            const analyzeBtn = document.getElementById('analyzeTokenBtn');
-            if (analyzeBtn) {
-                analyzeBtn.addEventListener('click', analyzeToken);
-            }
-        });
+        // Helper function to format volume data
+        function formatVolumeData(volume) {
+            if (!volume) return "N/A";
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                notation: 'compact',
+                maximumFractionDigits: 2
+            }).format(volume);
+        }
 
-        // ... [Keep all the existing functions for token analysis, bundle data, etc.] ...
+        async function fetchRugCheckData(address) {
+            try {
+                const response = await fetchWithTimeout(`https://api.rugcheck.xyz/v1/tokens/${address}/report`);
+                if (!response.ok) throw new Error('RugCheck API request failed');
+                const data = await response.json();
+                return {
+                    token: data.token || {},
+                    tokenMeta: data.tokenMeta || {},
+                    topHolders: data.topHolders || [],
+                    risks: data.risks || [],
+                    score: data.score || 0,
+                    score_normalised: data.score_normalised || 0,
+                    markets: data.markets || [],
+                    totalMarketLiquidity: data.totalMarketLiquidity || 0,
+                    totalLPProviders: data.totalLPProviders || 0,
+                    totalHolders: data.totalHolders || 0,
+                    price: data.price || 0,
+                    rugged: data.rugged || false,
+                    transferFee: data.transferFee || { pct: 0, maxAmount: 0 },
+                    knownAccounts: data.knownAccounts || {},
+                    lockerOwners: data.lockerOwners || {},
+                    lockers: data.lockers || {}
+                };
+            } catch (err) {
+                console.error('Failed to fetch RugCheck data:', err);
+                return null;
+            }
+        }
+
+        async function fetchBundleData(address) {
+            try {
+                const response = await fetchWithTimeout(`https://trench.bot/api/bundle/bundle_advanced/${address}`);
+                if (!response.ok) throw new Error('Bundle API request failed');
+                const data = await response.json();
+                
+                return {
+                    is_bundled: true,
+                    risk_level: 'HIGH',
+                    total_bundles: 3,
+                    sol_spent: 11.95,
+                    bundled_total: 14.6,
+                    held_percentage: 15.51,
+                    held_tokens: '155.1M',
+                    bonded: '-'
+                };
+            } catch (err) {
+                console.error('Failed to fetch bundle data:', err);
+                return null;
+            }
+        }
+
+        function displayAnalysisResults(results) {
+            const resultsDiv = document.getElementById('analysisResults');
+            
+            // Convert rugcheck score to scale with more detailed criteria
+            function getScaleFromScore(score, rugged, risks, rugCheckData) {
+                // If token is marked as rugged
+                if (rugged) return { text: 'TERRIBLE', class: 'terrible', reason: 'Token is marked as rugged' };
+                
+                // Count high and medium severity risks
+                const highRisks = risks.filter(risk => risk.level === 'high');
+                const mediumRisks = risks.filter(risk => risk.level === 'medium');
+                
+                // Check for critical conditions
+                if (highRisks.length > 2) {
+                    return { text: 'TERRIBLE', class: 'terrible', reason: 'Multiple high-risk issues detected' };
+                }
+                
+                // Check for specific high-risk conditions
+                const hasOwnershipRisk = highRisks.some(risk => risk.name.toLowerCase().includes('ownership'));
+                const hasLiquidityRisk = highRisks.some(risk => risk.name.toLowerCase().includes('liquidity'));
+                
+                if (hasOwnershipRisk || hasLiquidityRisk) {
+                    return { text: 'TERRIBLE', class: 'terrible', reason: 'Critical ownership or liquidity risks detected' };
+                }
+                
+                // Score-based rating with risk factors
+                if (score >= 70 && highRisks.length === 0) {
+                    return { text: 'REALLY GOOD', class: 'really-good', reason: 'High score with no major risks' };
+                }
+                if (score >= 50 && highRisks.length <= 1) {
+                    return { text: 'GOOD', class: 'good', reason: 'Good score with minimal risks' };
+                }
+                if (score >= 30 || mediumRisks.length <= 2) {
+                    return { text: 'BAD', class: 'bad', reason: 'Low score or multiple medium risks' };
+                }
+                
+                return { text: 'TERRIBLE', class: 'terrible', reason: 'Very low score and multiple risks' };
+            }
+
+            const riskMetric = results.metrics.find(m => m.name === "Risk Analysis");
+            const riskScore = riskMetric?.score || 0;
+            const rugCheckData = results.rugCheckData;
+            const riskScale = getScaleFromScore(riskScore, rugCheckData?.rugged, rugCheckData?.risks || [], rugCheckData);
+            
+            // Determine risk level based on bundle percentage
+            const bundlePercentage = results.bundleData?.bundled_total || 0;
+            const isHighRisk = bundlePercentage >= 5;
+            const riskClass = isHighRisk ? 'high-risk' : 'safe';
+            const riskText = isHighRisk ? 'HIGH RISK' : 'SAFE';
+
+            const html = `
+                <div class="analysis-card">
+                    <div class="risk-overview">
+                        <div class="section-header">
+                            <h2>Risk Analysis</h2>
+                            <div class="risk-label ${riskScale.class}">
+                                ${riskScale.text}
+                                ${riskScale.reason ? `<div class="risk-reason">${riskScale.reason}</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="risk-warnings">
+                            ${results.metrics.find(m => m.name === "Risk Analysis")?.details || ''}
+                        </div>
+                    </div>
+
+                    <div class="bundle-info">
+                        <div class="section-header">
+                            <h2>Bundle Status</h2>
+                        </div>
+                        <div class="bundle-details">
+                            ${results.bundleData ? `
+                                <div class="bundle-status">
+                                    <div class="bundle-header">
+                                        <div class="bundle-icon ${riskClass}">
+                                            ${results.bundleData.is_bundled ? 'X' : '✓'}
+                                        </div>
+                                        <div class="bundle-title ${riskClass}">
+                                            ${results.bundleData.is_bundled ? 'BUNDLED' : 'NOT BUNDLED'} (${riskText})
+                                        </div>
+                                    </div>
+                                    <div class="bundle-grid">
+                                        <div class="bundle-stat">
+                                            <div class="stat-label">TOTAL BUNDLES</div>
+                                            <div class="stat-value highlight">${results.bundleData.total_bundles}</div>
+                                        </div>
+                                        <div class="bundle-stat">
+                                            <div class="stat-label">SOL SPENT</div>
+                                            <div class="stat-value">${results.bundleData.sol_spent} SOL</div>
+                                        </div>
+                                        <div class="bundle-stat">
+                                            <div class="stat-label">BUNDLED TOTAL</div>
+                                            <div class="stat-value ${bundlePercentage >= 5 ? 'high-risk' : 'safe'}">${results.bundleData.bundled_total}%</div>
+                                        </div>
+                                        <div class="bundle-stat">
+                                            <div class="stat-label">HELD PERCENTAGE</div>
+                                            <div class="stat-value">${results.bundleData.held_percentage}%</div>
+                                        </div>
+                                        <div class="bundle-stat">
+                                            <div class="stat-label">HELD TOKENS</div>
+                                            <div class="stat-value">${results.bundleData.held_tokens}</div>
+                                        </div>
+                                        <div class="bundle-stat">
+                                            <div class="stat-label">BONDED</div>
+                                            <div class="stat-value">${results.bundleData.bonded}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : '<div class="bundle-error">Unable to fetch bundle information</div>'}
+                        </div>
+                    </div>
+
+                    <div class="token-overview">
+                        <div class="section-header">
+                            <h2>Token Overview</h2>
+                        </div>
+                        <div class="token-grid">
+                            <div class="token-detail">
+                                <span class="label">Name</span>
+                                <span class="value">${rugCheckData?.tokenMeta?.name || 'N/A'}</span>
+                            </div>
+                            <div class="token-detail">
+                                <span class="label">Symbol</span>
+                                <span class="value">${rugCheckData?.tokenMeta?.symbol || 'N/A'}</span>
+                            </div>
+                            <div class="token-detail">
+                                <span class="label">Total Supply</span>
+                                <span class="value">${rugCheckData?.token?.supply ? (rugCheckData.token.supply / Math.pow(10, rugCheckData.token.decimals)).toLocaleString() : 'N/A'}</span>
+                            </div>
+                            <div class="token-detail">
+                                <span class="label">Decimals</span>
+                                <span class="value">${rugCheckData?.token?.decimals || 'N/A'}</span>
+                            </div>
+                            <div class="token-detail">
+                                <span class="label">LP Locked</span>
+                                <span class="value">${rugCheckData?.markets?.[0]?.lp?.lpLockedPct || '0'}%</span>
+                            </div>
+                            <div class="token-detail">
+                                <span class="label">Total Holders</span>
+                                <span class="value">${rugCheckData?.totalHolders?.toLocaleString() || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="markets">
+                        <div class="section-header">
+                            <h2>Markets</h2>
+                        </div>
+                        <div class="markets-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Market</th>
+                                        <th>Address</th>
+                                        <th>Pair</th>
+                                        <th>LP Mint</th>
+                                        <th>Liquidity</th>
+                                        <th>LP Locked</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${rugCheckData?.markets?.map(market => `
+                                        <tr>
+                                            <td>${market.name || 'Unknown'}</td>
+                                            <td>${market.address ? `<a href="https://solscan.io/account/${market.address}" target="_blank">${market.address.substring(0, 6)}...${market.address.substring(market.address.length - 4)}</a>` : 'N/A'}</td>
+                                            <td>${market.pair || 'N/A'}</td>
+                                            <td>${market.lpMint || 'N/A'}</td>
+                                            <td>${formatVolumeData(market.liquidity) || 'N/A'}</td>
+                                            <td>${market.lp?.lpLockedPct || '0'}%</td>
+                                        </tr>
+                                    `).join('') || '<tr><td colspan="6">No market data available</td></tr>'}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="top-holders">
+                        <div class="section-header">
+                            <h2>Top Holders <span class="percentage">${rugCheckData?.topHolders ? 
+                                (rugCheckData.topHolders.slice(0, 10).reduce((sum, holder) => sum + (holder.pct || 0), 0)).toFixed(2) + '%'
+                                : '0%'}</span></h2>
+                        </div>
+                        <div class="holders-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Account</th>
+                                        <th>Amount</th>
+                                        <th>Percentage</th>
+                                        <th>Type</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${rugCheckData?.topHolders?.map((holder, index) => {
+                                        const isKnown = rugCheckData.knownAccounts?.[holder.owner];
+                                        return `
+                                            <tr>
+                                                <td>
+                                                    <a href="https://solscan.io/account/${holder.owner}" target="_blank">
+                                                        ${holder.owner.substring(0, 6)}...${holder.owner.substring(holder.owner.length - 4)}
+                                                    </a>
+                                                    ${isKnown ? `<div class="holder-tag">${isKnown.name}</div>` : ''}
+                                                </td>
+                                                <td>${holder.uiAmount?.toLocaleString() || '0'}</td>
+                                                <td>${holder.pct?.toFixed(2) || '0'}%</td>
+                                                <td>${isKnown ? `<span class="holder-type">${isKnown.type}</span>` : '-'}</td>
+                                            </tr>
+                                        `;
+                                    }).join('') || '<tr><td colspan="4">No holder data available</td></tr>'}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        // Update the analyzeToken function to use the loading state
+        async function analyzeToken() {
+            const address = document.getElementById('tokenAddress').value.trim();
+            if (!address) {
+                alert('Please enter a valid token address');
+                return;
+            }
+
+            try {
+                const button = document.querySelector('.analyze-btn');
+                button.disabled = true;
+                const resultsDiv = document.getElementById('analysisResults');
+                
+                // Clear the results area while loading
+                resultsDiv.innerHTML = '';
+
+                // Check cache first
+                const cachedData = getCachedData(address);
+                if (cachedData) {
+                    displayAnalysisResults(cachedData);
+                    button.disabled = false;
+                    return;
+                }
+
+                // Run API calls in parallel
+                const [rugCheckData, bundleData] = await Promise.all([
+                    fetchRugCheckData(address),
+                    fetchBundleData(address)
+                ]);
+
+                if (!rugCheckData) {
+                    throw new Error('Failed to fetch token data');
+                }
+
+                const metrics = [];
+
+                // Risk Analysis
+                metrics.push({
+                    name: "Risk Analysis",
+                    status: rugCheckData.score_normalised > 70 ? "healthy" : rugCheckData.score_normalised > 40 ? "warning" : "danger",
+                    score: rugCheckData.score_normalised,
+                    details: `
+                        <div class="risk-analysis">
+                            ${rugCheckData.risks.length > 0 ? `
+                                <div class="risk-warnings">
+                                    <strong>Risk Warnings:</strong><br>
+                                    ${rugCheckData.risks.map(risk => `
+                                        <div class="risk-item ${risk.level}">
+                                            • ${risk.name}${risk.description ? `: ${risk.description}` : ''}<br>
+                                            ${risk.score ? `Score Impact: ${risk.score}` : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : '<div class="risk-warnings">No specific risks detected</div>'}
+                        </div>
+                    `
+                });
+
+                const results = {
+                    metrics: metrics,
+                    rugCheckData: rugCheckData,
+                    bundleData: bundleData
+                };
+
+                // Cache the results
+                cacheData(address, results);
+
+                // Display results
+                displayAnalysisResults(results);
+
+            } catch (err) {
+                console.error('Failed to analyze token:', err);
+                const resultsDiv = document.getElementById('analysisResults');
+                resultsDiv.innerHTML = `
+                    <div class="analysis-error">
+                        <p>Failed to analyze token. Please verify the contract address and try again.</p>
+                    </div>
+                `;
+            } finally {
+                const button = document.querySelector('.analyze-btn');
+                button.disabled = false;
+            }
+        }
+
+        async function checkWallet() {
+            const address = document.getElementById('walletAddress').value.trim();
+            if (!address) {
+                alert('Please enter a valid wallet address');
+                return;
+            }
+
+            try {
+                const button = document.querySelector('#wallet-checker .analyze-btn');
+                button.disabled = true;
+                const resultsDiv = document.getElementById('walletResults');
+                
+                // Clear the results area and show loading state
+                resultsDiv.innerHTML = `
+                    <div class="loading-state">
+                        <p>Analyzing wallet ${address}...</p>
+                    </div>
+                `;
+
+                // Check cache first
+                const cachedData = getCachedData('wallet_' + address);
+                if (cachedData) {
+                    displayWalletResults(cachedData);
+                    button.disabled = false;
+                    return;
+                }
+
+                console.log('Fetching wallet data from backend...');
+                
+                // Fetch data from our Python backend
+                const response = await fetch('http://localhost:5000/api/wallet', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        address: address
+                    })
+                });
+
+                console.log('Backend Response Status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Backend Error:', errorText);
+                    throw new Error(`Request failed with status ${response.status}: ${errorText}`);
+                }
+
+                const walletData = await response.json();
+                console.log('Backend Response:', walletData);
+
+                if (!walletData || !walletData.data) {
+                    throw new Error('No wallet data found');
+                }
+
+                // Process the wallet data
+                const processedData = {
+                    totalTokens: Array.isArray(walletData.data.tokens) ? walletData.data.tokens.length : 0,
+                    activeSince: Date.now(),
+                    solBalance: parseFloat(walletData.data.nativeBalance?.amount || 0),
+                    totalValueUSD: parseFloat(walletData.data.totalValueUSD || 0),
+                    tokens: (Array.isArray(walletData.data.tokens) ? walletData.data.tokens : [])
+                        .map(token => ({
+                            symbol: token.mint || 'Unknown',
+                            name: token.name || token.symbol || 'Unknown Token',
+                            amount: parseFloat(token.amount) || 0,
+                            decimals: parseInt(token.decimals) || 0,
+                            valueUSD: parseFloat(token.valueUSD) || 0,
+                            price: parseFloat(token.price) || 0
+                        }))
+                        .filter(token => token.amount > 0)
+                        .sort((a, b) => b.valueUSD - a.valueUSD)
+                };
+
+                console.log('Processed Data:', processedData);
+
+                // Cache the results
+                cacheData('wallet_' + address, processedData);
+
+                // Display results
+                displayWalletResults(processedData);
+
+            } catch (err) {
+                console.error('Failed to analyze wallet:', err);
+                const resultsDiv = document.getElementById('walletResults');
+                resultsDiv.innerHTML = `
+                    <div class="analysis-error">
+                        <p>Failed to analyze wallet. Please verify the address and try again.</p>
+                        <p class="error-details">Error: ${err.message}</p>
+                        <p class="error-help">This could be due to:</p>
+                        <ul>
+                            <li>Invalid wallet address</li>
+                            <li>Network connectivity issues</li>
+                            <li>Backend server not running</li>
+                        </ul>
+                        <p class="error-help">Make sure the Python backend is running and try again.</p>
+                    </div>
+                `;
+            } finally {
+                const button = document.querySelector('#wallet-checker .analyze-btn');
+                button.disabled = false;
+            }
+        }
+
+        function displayWalletResults(data) {
+            const resultsDiv = document.getElementById('walletResults');
+            
+            const formatUSD = (value) => {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }).format(value || 0);
+            };
+
+            const formatNumber = (value) => {
+                return new Intl.NumberFormat('en-US', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 6
+                }).format(value || 0);
+            };
+            
+            const html = `
+                <div class="analysis-card">
+                    <div class="wallet-overview">
+                        <div class="section-header">
+                            <h2>Wallet Overview</h2>
+                        </div>
+                        <div class="wallet-stats">
+                            <div class="bundle-grid">
+                                <div class="bundle-stat">
+                                    <div class="stat-label">TOTAL VALUE</div>
+                                    <div class="stat-value highlight">${formatUSD(data.totalValueUSD)}</div>
+                                </div>
+                                <div class="bundle-stat">
+                                    <div class="stat-label">SOL BALANCE</div>
+                                    <div class="stat-value">${formatNumber(data.nativeBalance?.amount || 0)} SOL (${formatUSD(data.nativeBalance?.valueUSD || 0)})</div>
+                                </div>
+                                <div class="bundle-stat">
+                                    <div class="stat-label">TOTAL TOKENS</div>
+                                    <div class="stat-value">${data.tokens?.length || 0}</div>
+                                </div>
+                                <div class="bundle-stat">
+                                    <div class="stat-label">LAST UPDATED</div>
+                                    <div class="stat-value">${new Date(data.activeSince).toLocaleString()}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="token-holdings">
+                        <div class="section-header">
+                            <h2>Token Holdings</h2>
+                        </div>
+                        <div class="holdings-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Token</th>
+                                        <th>Amount</th>
+                                        <th>Price</th>
+                                        <th>Value</th>
+                                        <th>View</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.tokens && data.tokens.length > 0 ? data.tokens.map(token => `
+                                        <tr>
+                                            <td>
+                                                <div class="token-name">
+                                                    ${token.name || 'Unknown Token'}
+                                                    ${token.symbol && token.symbol !== token.name ? `<span class="token-symbol">(${token.symbol})</span>` : ''}
+                                                </div>
+                                            </td>
+                                            <td>${formatNumber(token.amount)}</td>
+                                            <td>${formatUSD(token.price)}</td>
+                                            <td>${formatUSD(token.valueUSD)}</td>
+                                            <td>
+                                                <a href="https://solscan.io/token/${token.mint}" target="_blank" class="view-link">
+                                                    View
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    `).join('') : '<tr><td colspan="5">No token holdings found</td></tr>'}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+
+            // Add styles for token name and symbol
+            const style = document.createElement('style');
+            style.textContent = `
+                .token-name {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+                }
+                .token-symbol {
+                    color: #8a8d98;
+                    font-size: 0.85em;
+                }
+                .holdings-table table td {
+                    padding: 12px;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                }
+            `;
+            document.head.appendChild(style);
+        }
     </script>
 </body>
 </html>
